@@ -50,9 +50,9 @@ int main(int argc, char* argv[])
   auto const target_pose = [] {
     geometry_msgs::msg::Pose msg;
     msg.orientation.w = 1.0;
-    msg.position.x = 0.28;
-    msg.position.y = -0.2;
-    msg.position.z = 0.5;
+    msg.position.x = 0.5;
+    msg.position.y = 0.5;
+    msg.position.z = 0.6;
     return msg;
   }();
   move_group_interface.setPoseTarget(target_pose);
@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
   {
     draw_title("Planning Failed!");
     moveit_visual_tools.trigger();
-    RCLCPP_ERROR(logger, "Planing failed!");
+    RCLCPP_ERROR(logger, "Planning failed!");
   }
 
   // Shutdown ROS
