@@ -16,7 +16,8 @@
     <joint name="optical_table_world_joint" type="fixed">
         <parent link="world"/>
         <child link="optical_table"/>
-        <origin xyz="0.0 0.0 0.006" rpy="0.0 0.0 ${pi/2}"/>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/> 
+        <!-- Change offset from z = 0.006 to 0.0 and rotation to 0, to work in positive quadrant -->
     </joint>
     
     <xacro:optical_table />
