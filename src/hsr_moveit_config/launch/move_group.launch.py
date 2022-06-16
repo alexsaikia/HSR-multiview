@@ -70,7 +70,9 @@ def generate_launch_description():
     planning_scene_monitor_parameters = {"publish_planning_scene": True,
                                          "publish_geometry_updates": True,
                                          "publish_state_updates": True,
-                                         "publish_transforms_updates": True}
+                                         "publish_transforms_updates": True,
+                                         "publish_robot_description": True,
+                                         "publish_robot_description_semantic": True}
 
     nodes = []
     # Start the actual move_group node/action server
@@ -123,7 +125,7 @@ def generate_launch_description():
         executable='ros2_control_node',
         parameters=[robot_description, iiwa_controller],
         prefix=['nice -n -20 '],
-        output="screen"
+        output="both"
     )
     nodes.append(ros2_control_node)
 
