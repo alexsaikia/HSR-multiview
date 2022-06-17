@@ -312,6 +312,19 @@
     </joint>
     
     <link name="${robot_name}_link_ee">
+      <!-- <visual>
+        <origin xyz="0.0 0.0 0.025" rpy="0 0 0"/>
+        <geometry>
+            <box size="0.1 0.05 0.05"/>
+        </geometry>
+      </visual>
+      
+      <collision>
+        <origin xyz="0.0 0.0 0.025" rpy="0 0 0"/>
+        <geometry>
+            <box size="0.1 0.05 0.05"/>
+        </geometry>
+      </collision> -->
     </link>
     
     <!--Extensions -->
