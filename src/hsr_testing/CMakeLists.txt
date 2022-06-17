@@ -45,11 +45,24 @@ ament_target_dependencies(
   "rclcpp"
 )
 
+add_executable(iiwa_avoid_box src/iiwa_avoid_box.cpp)
+# target_include_directories(iiwa_avoid_box PUBLIC
+#   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+#   $<INSTALL_INTERFACE:include>)
+# target_compile_features(iiwa_avoid_box PUBLIC c_std_99 cxx_std_17) # Require C99 and C++17
+ament_target_dependencies(
+  iiwa_avoid_box
+  "moveit_ros_planning_interface"
+  "moveit_visual_tools"
+  "rclcpp"
+)
+
 
 install(TARGETS
   iiwa_first_move
   iiwa_ompl_demo
   iiwa_trajectory_test
+  iiwa_avoid_box
   DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY include/ DESTINATION include)
