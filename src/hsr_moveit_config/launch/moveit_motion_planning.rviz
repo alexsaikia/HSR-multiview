@@ -57,20 +57,20 @@ Visualization Manager:
       MoveIt_Allow_External_Program: false
       MoveIt_Allow_Replanning: false
       MoveIt_Allow_Sensor_Positioning: false
-      MoveIt_Planning_Attempts: 10
-      MoveIt_Planning_Time: 5
+      MoveIt_Planning_Attempts: 30
+      MoveIt_Planning_Time: 50
       MoveIt_Use_Cartesian_Path: false
       MoveIt_Use_Constraint_Aware_IK: true
       MoveIt_Warehouse_Host: 127.0.0.1
       MoveIt_Warehouse_Port: 33829
       MoveIt_Workspace:
         Center:
-          X: 0
-          Y: 0
-          Z: 0
+          X: 0.375
+          Y: 0.45
+          Z: 0.5
         Size:
-          X: 2
-          Y: 2
+          X: 1.5
+          Y: 1.5
           Z: 2
       Name: MotionPlanning
       Planned Path:
@@ -82,74 +82,6 @@ Visualization Manager:
           Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
-          cutting_plate:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          cutting_plate_base:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          cutting_tool:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          cutting_tool_base:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          cutting_tool_tip:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          gripper_implant_holder:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_implant_support:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_jaw_centre:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          gripper_jaw_left:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          gripper_jaw_right:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          gripper_link_iiwa_attachment:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_link_left:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_link_main_body:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_link_right:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          home_a_implant:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           iiwa_link_0:
             Alpha: 1
             Show Axes: false
@@ -277,74 +209,6 @@ Visualization Manager:
           Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
-          cutting_plate:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          cutting_plate_base:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          cutting_tool:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          cutting_tool_base:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          cutting_tool_tip:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          gripper_implant_holder:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_implant_support:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_jaw_centre:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          gripper_jaw_left:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          gripper_jaw_right:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          gripper_link_iiwa_attachment:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_link_left:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_link_main_body:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_link_right:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          home_a_implant:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           iiwa_link_0:
             Alpha: 1
             Show Axes: false
@@ -436,37 +300,7 @@ Visualization Manager:
       Enabled: true
       Frame Timeout: 15
       Frames:
-        All Enabled: false
-        cutting_plate:
-          Value: false
-        cutting_plate_base:
-          Value: true
-        cutting_tool:
-          Value: true
-        cutting_tool_base:
-          Value: true
-        cutting_tool_tip:
-          Value: true
-        gripper_implant_holder:
-          Value: true
-        gripper_implant_support:
-          Value: true
-        gripper_jaw_centre:
-          Value: true
-        gripper_jaw_left:
-          Value: true
-        gripper_jaw_right:
-          Value: true
-        gripper_link_iiwa_attachment:
-          Value: true
-        gripper_link_left:
-          Value: false
-        gripper_link_main_body:
-          Value: false
-        gripper_link_right:
-          Value: false
-        home_a_implant:
-          Value: false
+        All Enabled: false        
         iiwa_link_0:
           Value: false
         iiwa_link_1:
@@ -512,15 +346,7 @@ Visualization Manager:
         world:
           optical_table:
             optical_table_back_left_bolt:
-              cutting_plate:
-                cutting_plate_base:
-                  cutting_tool:
-                    cutting_tool_base:
-                      {}
-                    cutting_tool_tip:
-                      {}
-              home_a_implant:
-                {}
+              {}
             optical_table_back_right_bolt:
               {}
             optical_table_front_left_bolt:
@@ -535,21 +361,7 @@ Visualization Manager:
                               iiwa_link_5:
                                 iiwa_link_6:
                                   iiwa_link_7:
-                                    iiwa_link_ee:
-                                      gripper_link_iiwa_attachment:
-                                        gripper_link_main_body:
-                                          gripper_implant_holder:
-                                            {}
-                                          gripper_implant_support:
-                                            {}
-                                          gripper_jaw_centre:
-                                            {}
-                                          gripper_link_left:
-                                            gripper_jaw_left:
-                                              {}
-                                          gripper_link_right:
-                                            gripper_jaw_right:
-                                              {}
+                                    iiwa_link_ee:                                      
             optical_table_front_right_bolt:
               {}
       Update Interval: 0
@@ -570,7 +382,7 @@ Visualization Manager:
   Global Options:
     Background Color: 40; 40; 40
     Fixed Frame: optical_table
-    Frame Rate: 30
+    Frame Rate: 100
   Name: root
   Tools:
     - Class: rviz_default_plugins/Interact
