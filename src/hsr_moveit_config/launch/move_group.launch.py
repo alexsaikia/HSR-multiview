@@ -1,6 +1,9 @@
 import os
 import yaml
 from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
+from launch.conditions import IfCondition
 from launch_ros.actions import Node
 from launch.actions import ExecuteProcess
 from ament_index_python.packages import get_package_share_directory
@@ -36,6 +39,14 @@ def load_xacro(package_name, file_path):
 
 
 def generate_launch_description():
+
+    nodes = []
+    # # Command-line arguments
+    # walls_arg = DeclareLaunchArgument(
+    #     "walls", default_value="True", description="Walls flag"
+    # )
+    # nodes.append(walls_arg)
+
     # Component yaml files are grouped in separate namespaces
     ######################
     #### Config Files ####
@@ -74,7 +85,7 @@ def generate_launch_description():
                                          "publish_robot_description": True,
                                          "publish_robot_description_semantic": True}
 
-    nodes = []
+    
     # Start the actual move_group node/action server
     move_group_node = Node(package='moveit_ros_move_group',
                            executable='move_group',
@@ -90,7 +101,7 @@ def generate_launch_description():
     nodes.append(move_group_node)
 
     # RViz
-    rviz_config_file = get_package_share_directory('hsr_moveit_config') + "/launch/moveit_motion_planning.rviz"
+    rviz_config_file = get_package_share_directory('hsr_moveit_config') + "/launch/moveit_iiwa_config.rviz"
 
     rviz_node = Node(package='rviz2',
                      executable='rviz2',
@@ -143,5 +154,14 @@ def generate_launch_description():
         arguments=["iiwa_arm_controller", "-c", "/controller_manager"],
     )
     nodes.append(robot_controller_spawner)
+   
+     
+    # hsr_scene_geometry = Node(
+    #     package='hsr_scene_geometry',
+    #     executable='hsr_scene_geometry',
+    #     name='hsr_scene_geometry',
+    #     condition=IfCondition(LaunchConfiguration("walls")),
+    # )
+    # nodes.append(hsr_scene_geometry)
 
     return LaunchDescription(nodes)
