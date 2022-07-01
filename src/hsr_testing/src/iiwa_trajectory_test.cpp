@@ -31,7 +31,9 @@ int main(int argc, char *argv[])
   // Create the MoveIt MoveGroup Interface
   using moveit::planning_interface::MoveGroupInterface;
   auto move_group_interface = MoveGroupInterface(node, "iiwa");
-
+  //Set speeds
+  move_group_interface.setMaxVelocityScalingFactor(0.6);
+  move_group_interface.setMaxAccelerationScalingFactor(0.6);
   // Construct and initialize MoveItVisualTools
   auto moveit_visual_tools =
       moveit_visual_tools::MoveItVisualTools{node, "world", rviz_visual_tools::RVIZ_MARKER_TOPIC,
@@ -60,9 +62,9 @@ int main(int argc, char *argv[])
     // moveit_visual_tools.publishTrajectoryPoint(trajectory, jmg);
   };
 
-  const int N = 5;
-  const double polar_range = 0.6 * PI / 2;
-  const double rad = 0.15;
+  const int N = 8;
+  const double polar_range = 0.7 * PI / 2;
+  const double rad = 0.10;
   double azimuth[N];
   double polar[N];
   int s = 0;
@@ -75,7 +77,7 @@ int main(int argc, char *argv[])
   }
 
   // Define sample point
-  Eigen::Vector3d s_pos(0.4, 0.6, 0.06);
+  Eigen::Vector3d s_pos(0.45, 0.6, 0.06);
 
   // auto const draw_sphere = [&moveit_visual_tools](auto s_pos, auto polar, auto azimuth, auto rad)
   // {
