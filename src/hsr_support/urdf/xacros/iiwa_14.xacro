@@ -305,27 +305,51 @@
       </collision>
     </link>
     
-    <joint name="${robot_name}_joint_ee" type="fixed">
+    <joint name="${robot_name}_joint_camera" type="fixed">
       <parent link="${robot_name}_link_7"/>
-      <child link="${robot_name}_link_ee"/>
+      <child link="${robot_name}_link_camera"/>
       <origin xyz="0 0 0.126" rpy="0 0 0"/>
     </joint>
     
-    <link name="${robot_name}_link_ee">
+    <link name="${robot_name}_link_camera">
       <visual>
         <origin xyz="0.0 0.0 0.05" rpy="0 0 0"/>
         <geometry>
-            <box size="0.1 0.1 0.1"/>
+            <box size="0.15 0.1 0.1"/>
         </geometry>
       </visual>
       
       <collision>
         <origin xyz="0.0 0.0 0.05" rpy="0 0 0"/>
         <geometry>
-            <box size="0.1 0.1 0.1"/>
+            <box size="0.15 0.1 0.1"/>
         </geometry>
       </collision>
     </link>
+
+    <joint name="${robot_name}_joint_ee" type="fixed">
+      <parent link="${robot_name}_link_camera"/>
+      <child link="${robot_name}_link_ee"/>
+      <origin xyz="0 0 0.10" rpy="0 0 0"/>
+    </joint>
+
+    <link name="${robot_name}_link_ee">
+      <visual>
+        <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+        <geometry>
+            <box size="0.0 0.0 0.0"/>
+        </geometry>
+      </visual>
+      
+      <collision>
+        <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+        <geometry>
+            <box size="0.0 0.0 0.0"/>
+        </geometry>
+      </collision>
+    </link>
+
+    
     
     <!--Extensions -->
     <xacro:if value="$(arg use_ros2_control)" >

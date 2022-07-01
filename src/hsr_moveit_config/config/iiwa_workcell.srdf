@@ -17,11 +17,12 @@
         <joint name="iiwa_joint_5"/>
         <joint name="iiwa_joint_6"/>
         <joint name="iiwa_joint_7"/>
+        <joint name="iiwa_joint_camera"/>
         <joint name="iiwa_joint_ee"/>
         <chain base_link="iiwa_link_0" tip_link="iiwa_link_ee" />
     </group>
 
-    
+    <virtual_joint name = "optical_table_world_joint" child_link = "optical_table" parent_frame = "world" type="fixed"/>
     
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
     <disable_collisions link1="iiwa_link_0" link2="iiwa_link_1" reason="Adjacent"/>
@@ -59,5 +60,8 @@
     <disable_collisions link1="iiwa_link_6" link2="iiwa_link_7" reason="Adjacent"/>
     <disable_collisions link1="iiwa_link_6" link2="iiwa_link_ee" reason="Adjacent"/>
     <disable_collisions link1="iiwa_link_7" link2="iiwa_link_ee" reason="Adjacent"/>
+    <disable_collisions link1="iiwa_link_6" link2="iiwa_link_camera" reason="Adjacent"/>
+    <disable_collisions link1="iiwa_link_7" link2="iiwa_link_camera" reason="Adjacent"/>
+    <disable_collisions link1="iiwa_link_camera" link2="iiwa_link_ee" reason="Adjacent"/>
     <disable_collisions link1="iiwa_mounting_plate" link2="optical_table" reason="Adjacent"/>
 </robot>
