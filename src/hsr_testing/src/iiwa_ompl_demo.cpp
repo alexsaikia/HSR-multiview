@@ -542,7 +542,7 @@ int main(int argc, char** argv)
         // contains helper functions to automate constructing constraint messages.
         constrained_planning.moveToStart();
         // 1. Box Constraints
-        // constrained_planning.planBoxConstraints();
+        constrained_planning.planBoxConstraints();
         // constrained_planning.deleteAllMarkers();
 
         // constrained_planning.moveToStart();
