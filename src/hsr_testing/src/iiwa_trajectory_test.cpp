@@ -63,6 +63,67 @@ int main(int argc, char *argv[])
     // moveit_visual_tools.publishTrajectoryPoint(trajectory, jmg);
   };
 
+  auto const ref_link_ = move_group_interface.getPoseReferenceFrame();
+  auto const ee_link_ = move_group_interface.getEndEffectorLink();
+  move_group_interface.clearPoseTargets();
+  move_group_interface.clearPathConstraints();
+  
+  shape_msgs::msg::SolidPrimitive cbox;
+  cbox.type = shape_msgs::msg::SolidPrimitive::BOX;
+  cbox.dimensions = {1.3, 1.3, 3.0};
+  
+  geometry_msgs::msg::Pose cbox_pose;
+  cbox_pose.position.x = 0.3;
+  cbox_pose.position.y = 0.4;
+  cbox_pose.position.z = 0.5;
+
+  moveit_msgs::msg::Constraints path_constraints;
+  path_constraints.name = "box constraints";
+  
+  // moveit_msgs::msg::PositionConstraint pcm5;
+  // pcm5.header.frame_id = ref_link_;
+  // pcm5.link_name = "iiwa_link_5";
+  // pcm5.weight = 1.0;
+  // pcm5.constraint_region.primitives.emplace_back(cbox);
+  // pcm5.constraint_region.primitive_poses.emplace_back(cbox_pose);
+  // path_constraints.position_constraints.emplace_back(pcm5);
+
+  // moveit_msgs::msg::PositionConstraint pcm6;
+  // pcm6.header.frame_id = ref_link_;
+  // pcm6.link_name = "iiwa_link_6";
+  // pcm6.weight = 1.0;
+  // pcm6.constraint_region.primitives.emplace_back(cbox);
+  // pcm6.constraint_region.primitive_poses.emplace_back(cbox_pose);
+  // path_constraints.position_constraints.emplace_back(pcm6);
+  
+  // moveit_msgs::msg::PositionConstraint pcm7;
+  // pcm7.header.frame_id = ref_link_;
+  // pcm7.link_name = "iiwa_link_7";
+  // pcm7.weight = 1.0;
+  // pcm7.constraint_region.primitives.emplace_back(cbox);
+  // pcm7.constraint_region.primitive_poses.emplace_back(cbox_pose);
+  // path_constraints.position_constraints.emplace_back(pcm7);
+  
+  // moveit_msgs::msg::PositionConstraint pcmC;
+  // pcmC.header.frame_id = ref_link_;
+  // pcmC.link_name = "iiwa_link_camera";
+  // pcmC.weight = 1.0;
+  // pcmC.constraint_region.primitives.emplace_back(cbox);
+  // pcmC.constraint_region.primitive_poses.emplace_back(cbox_pose);
+  // path_constraints.position_constraints.emplace_back(pcmC);
+
+  moveit_msgs::msg::PositionConstraint pcmee;
+  pcmee.header.frame_id = ref_link_;
+  pcmee.link_name = "iiwa_link_ee";
+  pcmee.weight = 1.0;
+  pcmee.constraint_region.primitives.emplace_back(cbox);
+  pcmee.constraint_region.primitive_poses.emplace_back(cbox_pose);
+  path_constraints.position_constraints.emplace_back(pcmee);
+  
+  
+
+  move_group_interface.setPathConstraints(path_constraints);
+
   const int N = 8;
   const double polar_range = 0.7 * PI / 2;
   const double rad = 0.15;
