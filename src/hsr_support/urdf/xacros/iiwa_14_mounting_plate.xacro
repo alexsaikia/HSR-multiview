@@ -12,16 +12,17 @@
 
     <link name="${robot_name}_mounting_plate">
       <visual>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <origin xyz="0 0 0.01" rpy="0 0 0"/>
         <geometry>
-          <mesh filename="package://hsr_support/meshes/structure/visual/iiwa_14_mounting_plate.dae"/>
+          <box size="0.275 0.275 0.02"/>
+          <!-- <mesh filename="package://hsr_support/meshes/structure/visual/iiwa_14_mounting_plate.dae"/> -->
         </geometry>
       </visual>
-      
+
       <collision>
-        <origin xyz="0 0 0.006" rpy="0 0 0"/>
+        <origin xyz="0 0 0.01" rpy="0 0 0"/>
         <geometry>
-            <box size="0.275 0.275 0.012"/>
+          <box size="0.275 0.275 0.02"/>
         </geometry>
       </collision>
     </link>
@@ -31,8 +32,8 @@
     <joint name="${robot_name}_mounting_plate_centre_top_surface_joint" type="fixed">
       <parent link="${robot_name}_mounting_plate"/>
       <child link="${robot_name}_mounting_plate_centre_top_surface"/>
-      <origin xyz="0 0 0.012" rpy="0 0 0"/>
+      <origin xyz="0 0 0.02" rpy="0 0 0"/>
     </joint>
   </xacro:macro>
-  
+
 </robot>

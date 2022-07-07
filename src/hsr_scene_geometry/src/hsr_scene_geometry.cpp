@@ -81,12 +81,67 @@ int main(int argc, char* argv[])
     return collision_object;
   }();
 
+  auto const collision_object2 = [frame_id = move_group_interface.getPlanningFrame()] {
+    moveit_msgs::msg::CollisionObject collision_object;
+    collision_object.header.frame_id = frame_id;
+    collision_object.id = "virtualwall0";
+    shape_msgs::msg::SolidPrimitive primitive;
+
+    // Define the size of the box in meters
+    primitive.type = primitive.BOX;
+    primitive.dimensions.resize(3);
+    primitive.dimensions[primitive.BOX_X] = 0.01;
+    primitive.dimensions[primitive.BOX_Y] = 1.1;
+    primitive.dimensions[primitive.BOX_Z] = 1.0;
+
+    // Define the pose of the box (relative to the frame_id)
+    geometry_msgs::msg::Pose box_pose;
+    box_pose.orientation.w = 1.0;
+    box_pose.position.x = -0.25;
+    box_pose.position.y = 0.45;
+    box_pose.position.z = 0.5;
+
+    collision_object.primitives.push_back(primitive);
+    collision_object.primitive_poses.push_back(box_pose);
+    collision_object.operation = collision_object.ADD;
+
+    return collision_object;
+  }();
+
+  auto const collision_object3 = [frame_id = move_group_interface.getPlanningFrame()] {
+    moveit_msgs::msg::CollisionObject collision_object;
+    collision_object.header.frame_id = frame_id;
+    collision_object.id = "virtualwall1";
+    shape_msgs::msg::SolidPrimitive primitive;
+
+    // Define the size of the box in meters
+    primitive.type = primitive.BOX;
+    primitive.dimensions.resize(3);
+    primitive.dimensions[primitive.BOX_X] = 1.0;
+    primitive.dimensions[primitive.BOX_Y] = 0.01;
+    primitive.dimensions[primitive.BOX_Z] = 1.0;
+
+    // Define the pose of the box (relative to the frame_id)
+    geometry_msgs::msg::Pose box_pose;
+    box_pose.orientation.w = 1.0;
+    box_pose.position.x = 0.375;
+    box_pose.position.y = -0.25;
+    box_pose.position.z = 0.5;
+
+    collision_object.primitives.push_back(primitive);
+    collision_object.primitive_poses.push_back(box_pose);
+    collision_object.operation = collision_object.ADD;
+
+    return collision_object;
+  }();
+
 
   // Add the collision object to the scene
   moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
   planning_scene_interface.applyCollisionObject(collision_object0);
   planning_scene_interface.applyCollisionObject(collision_object1);
-  
+  planning_scene_interface.applyCollisionObject(collision_object2);
+  planning_scene_interface.applyCollisionObject(collision_object3);
 
   // Shutdown ROS
   rclcpp::shutdown();

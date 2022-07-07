@@ -1,5 +1,6 @@
 #include <iostream>
 #include <moveit/move_group_interface/move_group_interface.h>
+#include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <moveit_visual_tools/moveit_visual_tools.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <math.h>
@@ -31,9 +32,9 @@ int main(int argc, char *argv[])
   // Create the MoveIt MoveGroup Interface
   using moveit::planning_interface::MoveGroupInterface;
   auto move_group_interface = MoveGroupInterface(node, "iiwa");
-  //Set speeds
+  // Set speeds
   move_group_interface.setMaxVelocityScalingFactor(0.6);
-  move_group_interface.setMaxAccelerationScalingFactor(0.6);
+  move_group_interface.setMaxAccelerationScalingFactor(0.1);
   // Construct and initialize MoveItVisualTools
   auto moveit_visual_tools =
       moveit_visual_tools::MoveItVisualTools{node, "world", rviz_visual_tools::RVIZ_MARKER_TOPIC,
@@ -64,7 +65,7 @@ int main(int argc, char *argv[])
 
   const int N = 8;
   const double polar_range = 0.7 * PI / 2;
-  const double rad = 0.10;
+  const double rad = 0.15;
   double azimuth[N];
   double polar[N];
   int s = 0;
@@ -72,28 +73,41 @@ int main(int argc, char *argv[])
 
   for (int i = 0; i < N; i++)
   {
-    azimuth[i] = (N-1-i) * 2 * PI / N;
-    polar[i] = (N-1-i) * polar_range / N;
+    azimuth[i] = (N - 1 - i) * 2 * PI / N;
+    polar[i] = (N - 1 - i) * polar_range / N;
   }
 
   // Define sample point
   Eigen::Vector3d s_pos(0.45, 0.6, 0.06);
+  auto const sample_collision_object = [frame_id = move_group_interface.getPlanningFrame(), s_pos, rad]
+  {
+    moveit_msgs::msg::CollisionObject collision_object;
+    collision_object.header.frame_id = frame_id;
+    collision_object.id = "sample";
+    shape_msgs::msg::SolidPrimitive primitive;
 
-  // auto const draw_sphere = [&moveit_visual_tools](auto s_pos, auto polar, auto azimuth, auto rad)
-  // {
-  //   for (int i = 0; i < N; i++)
-  //   {
-  //     for (int j = 0; j < N; j++)
-  //     {
-  //       auto markers = Eigen::Isometry3d::Identity();
-  //       markers.translation().x() = (s_pos[0] + rad * cos(azimuth[j]) * sin(polar[i]));
-  //       markers.translation().y() = (s_pos[1] + rad * sin(azimuth[j]) * sin(polar[i]));
-  //       markers.translation().z() = (s_pos[2] + rad * cos(polar[i]));
-  //       moveit_visual_tools.publishSphere(markers, rviz_visual_tools::WHITE);
-  //     }
-  //   }
-  // };
-  // draw_sphere(s_pos, polar, azimuth, rad);
+    // Define the size of the box in meters
+    primitive.type = primitive.SPHERE;
+    primitive.dimensions.resize(1);
+    primitive.dimensions[primitive.SPHERE_RADIUS] = 0.9 * rad;
+
+    // Define the pose of the box (relative to the frame_id)
+    geometry_msgs::msg::Pose box_pose;
+    box_pose.orientation.w = 1.0;
+    box_pose.position.x = s_pos[0];
+    box_pose.position.y = s_pos[1];
+    box_pose.position.z = s_pos[2];
+
+    collision_object.primitives.push_back(primitive);
+    collision_object.primitive_poses.push_back(box_pose);
+    collision_object.operation = collision_object.ADD;
+
+    return collision_object;
+  }();
+
+  // Add the collision object to the scene
+  moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
+  planning_scene_interface.applyCollisionObject(sample_collision_object);
 
   for (int i = 0; i < N; i++)
   {
