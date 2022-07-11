@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
     geometry_msgs::msg::Pose box_pose;
     box_pose.orientation.w = 1.0;
     box_pose.position.x = 0.375;
-    box_pose.position.y = 1.0;
+    box_pose.position.y = 0.95;
     box_pose.position.z = 0.5;
 
     collision_object.primitives.push_back(primitive);

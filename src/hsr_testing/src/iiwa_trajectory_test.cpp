@@ -33,8 +33,8 @@ int main(int argc, char *argv[])
   using moveit::planning_interface::MoveGroupInterface;
   auto move_group_interface = MoveGroupInterface(node, "iiwa");
   // Set speeds
-  move_group_interface.setMaxVelocityScalingFactor(0.6);
-  move_group_interface.setMaxAccelerationScalingFactor(0.1);
+  move_group_interface.setMaxVelocityScalingFactor(0.5);
+  move_group_interface.setMaxAccelerationScalingFactor(1.0);
   // Construct and initialize MoveItVisualTools
   auto moveit_visual_tools =
       moveit_visual_tools::MoveItVisualTools{node, "world", rviz_visual_tools::RVIZ_MARKER_TOPIC,
@@ -60,25 +60,24 @@ int main(int argc, char *argv[])
           auto const trajectory)
   {
     moveit_visual_tools.publishTrajectoryLine(trajectory, jmg);
-    // moveit_visual_tools.publishTrajectoryPoint(trajectory, jmg);
   };
 
-  auto const ref_link_ = move_group_interface.getPoseReferenceFrame();
-  auto const ee_link_ = move_group_interface.getEndEffectorLink();
-  move_group_interface.clearPoseTargets();
-  move_group_interface.clearPathConstraints();
+  // auto const ref_link_ = move_group_interface.getPoseReferenceFrame();
+  // auto const ee_link_ = move_group_interface.getEndEffectorLink();
+  // move_group_interface.clearPoseTargets();
+  // move_group_interface.clearPathConstraints();
   
-  shape_msgs::msg::SolidPrimitive cbox;
-  cbox.type = shape_msgs::msg::SolidPrimitive::BOX;
-  cbox.dimensions = {1.3, 1.3, 3.0};
+  // shape_msgs::msg::SolidPrimitive cbox;
+  // cbox.type = shape_msgs::msg::SolidPrimitive::BOX;
+  // cbox.dimensions = {1.6, 1.3, 3.0};
   
-  geometry_msgs::msg::Pose cbox_pose;
-  cbox_pose.position.x = 0.3;
-  cbox_pose.position.y = 0.4;
-  cbox_pose.position.z = 0.5;
+  // geometry_msgs::msg::Pose cbox_pose;
+  // cbox_pose.position.x = 0.0;
+  // cbox_pose.position.y = 0.4;
+  // cbox_pose.position.z = 0.5;
 
-  moveit_msgs::msg::Constraints path_constraints;
-  path_constraints.name = "box constraints";
+  // moveit_msgs::msg::Constraints path_constraints;
+  // path_constraints.name = "box constraints";
   
   // moveit_msgs::msg::PositionConstraint pcm5;
   // pcm5.header.frame_id = ref_link_;
@@ -112,21 +111,19 @@ int main(int argc, char *argv[])
   // pcmC.constraint_region.primitive_poses.emplace_back(cbox_pose);
   // path_constraints.position_constraints.emplace_back(pcmC);
 
-  moveit_msgs::msg::PositionConstraint pcmee;
-  pcmee.header.frame_id = ref_link_;
-  pcmee.link_name = "iiwa_link_ee";
-  pcmee.weight = 1.0;
-  pcmee.constraint_region.primitives.emplace_back(cbox);
-  pcmee.constraint_region.primitive_poses.emplace_back(cbox_pose);
-  path_constraints.position_constraints.emplace_back(pcmee);
+  // moveit_msgs::msg::PositionConstraint pcmee;
+  // pcmee.header.frame_id = ref_link_;
+  // pcmee.link_name = "iiwa_link_ee";
+  // pcmee.weight = 1.0;
+  // pcmee.constraint_region.primitives.emplace_back(cbox);
+  // pcmee.constraint_region.primitive_poses.emplace_back(cbox_pose);
+  // path_constraints.position_constraints.emplace_back(pcmee);
   
-  
-
-  move_group_interface.setPathConstraints(path_constraints);
+  // move_group_interface.setPathConstraints(path_constraints);
 
   const int N = 8;
   const double polar_range = 0.7 * PI / 2;
-  const double rad = 0.15;
+  const double rad = 0.10;
   double azimuth[N];
   double polar[N];
   int s = 0;
@@ -139,7 +136,7 @@ int main(int argc, char *argv[])
   }
 
   // Define sample point
-  Eigen::Vector3d s_pos(0.45, 0.6, 0.06);
+  Eigen::Vector3d s_pos(0.4, 0.6, 0.06);
   auto const sample_collision_object = [frame_id = move_group_interface.getPlanningFrame(), s_pos, rad]
   {
     moveit_msgs::msg::CollisionObject collision_object;

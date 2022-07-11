@@ -2,7 +2,8 @@ import os
 import yaml
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, Command, PathJoinSubstitution, FindExecutable
+from launch_ros.substitutions import FindPackageShare
 from launch.conditions import IfCondition
 from launch_ros.actions import Node
 from launch.actions import ExecuteProcess
@@ -39,20 +40,48 @@ def load_xacro(package_name, file_path):
 
 
 def generate_launch_description():
+    declared_arguments = [DeclareLaunchArgument("robot_ip", default_value="192.170.10.2",
+                                                description="IP address of the kuka KONI"),
+                          DeclareLaunchArgument("robot_port", default_value="30200",
+                                                description="Port used by the FRI (30200 - 30209"),
+                          DeclareLaunchArgument("real", default_value="false",
+                                                description="Type of manipulator to startup (fake/false or real/true)")]
+
+    robot_ip = LaunchConfiguration("robot_ip")
+    robot_port = LaunchConfiguration("robot_port")
+    manipulator = LaunchConfiguration("real")
 
     nodes = []
-    # # Command-line arguments
-    # walls_arg = DeclareLaunchArgument(
-    #     "walls", default_value="True", description="Walls flag"
-    # )
-    # nodes.append(walls_arg)
+    # Command-line arguments
+    walls_arg = DeclareLaunchArgument(
+        "walls", default_value="True", description="Walls flag"
+    )
+    nodes.append(walls_arg)
 
     # Component yaml files are grouped in separate namespaces
     ######################
     #### Config Files ####
     ######################
-    doc = load_xacro('hsr_support', 'urdf/iiwa_workcell.urdf.xacro')
-    robot_description = {'robot_description': doc}
+    robot_description_content = Command(
+        [
+            PathJoinSubstitution([FindExecutable(name="xacro")]),
+            " ",
+            PathJoinSubstitution([FindPackageShare('hsr_support'), "urdf", 'iiwa_workcell.urdf.xacro']),
+            " ",
+            "robot_ip:=",
+            robot_ip,
+            " ",
+            " ",
+            "robot_port:=",
+            robot_port,
+            " ",
+            " ",
+            "hardware:=",
+            manipulator,
+            " "
+        ]
+    )
+    robot_description = {'robot_description': robot_description_content}
 
     robot_description_semantic_config = load_file('hsr_moveit_config', 'config/iiwa_workcell.srdf')
     robot_description_semantic = {'robot_description_semantic': robot_description_semantic_config}
@@ -156,12 +185,12 @@ def generate_launch_description():
     nodes.append(robot_controller_spawner)
    
      
-    # hsr_scene_geometry = Node(
-    #     package='hsr_scene_geometry',
-    #     executable='hsr_scene_geometry',
-    #     name='hsr_scene_geometry',
-    #     condition=IfCondition(LaunchConfiguration("walls")),
-    # )
-    # nodes.append(hsr_scene_geometry)
+    hsr_scene_geometry = Node(
+        package='hsr_scene_geometry',
+        executable='hsr_scene_geometry',
+        name='hsr_scene_geometry',
+        condition=IfCondition(LaunchConfiguration("walls")),
+    )
+    nodes.append(hsr_scene_geometry)
 
-    return LaunchDescription(nodes)
+    return LaunchDescription(declared_arguments + nodes)

@@ -4,28 +4,12 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /MotionPlanning1/Scene Robot1/Links1/iiwa_link_01
-        - /MotionPlanning1/Scene Robot1/Links1/iiwa_link_11
-        - /MotionPlanning1/Scene Robot1/Links1/iiwa_link_21
-        - /MotionPlanning1/Scene Robot1/Links1/iiwa_link_31
-        - /MotionPlanning1/Scene Robot1/Links1/iiwa_link_41
-        - /MotionPlanning1/Scene Robot1/Links1/iiwa_link_51
-        - /MotionPlanning1/Scene Robot1/Links1/iiwa_link_61
-        - /MotionPlanning1/Scene Robot1/Links1/iiwa_link_71
-        - /MotionPlanning1/Scene Robot1/Links1/iiwa_link_ee1
-        - /MotionPlanning1/Scene Robot1/Links1/iiwa_mounting_plate1
-        - /MotionPlanning1/Scene Robot1/Links1/iiwa_mounting_plate_centre_top_surface1
-        - /MotionPlanning1/Scene Robot1/Links1/iiwa_mounting_plate_front_left_bolt1
-        - /MotionPlanning1/Scene Robot1/Links1/optical_table1
-        - /MotionPlanning1/Scene Robot1/Links1/optical_table_back_left_bolt1
-        - /MotionPlanning1/Scene Robot1/Links1/optical_table_back_right_bolt1
-        - /MotionPlanning1/Scene Robot1/Links1/optical_table_front_left_bolt1
-        - /MotionPlanning1/Scene Robot1/Links1/optical_table_front_right_bolt1
-        - /MotionPlanning1/Scene Robot1/Links1/world1
+        - /MotionPlanning1
+        - /MotionPlanning1/Planned Path1
         - /TF1/Frames1
         - /Marker1/Topic1
       Splitter Ratio: 0.5
-    Tree Height: 264
+    Tree Height: 266
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -133,6 +117,11 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          iiwa_link_camera:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
           iiwa_link_ee:
             Alpha: 1
             Show Axes: false
@@ -184,7 +173,7 @@ Visualization Manager:
         Show Trail: false
         State Display Time: 0.05 s
         Trail Step Size: 1
-        Trajectory Topic: /move_group/display_planned_path
+        Trajectory Topic: /display_planned_path
         Use Sim Time: false
       Planning Metrics:
         Payload: 1
@@ -219,7 +208,7 @@ Visualization Manager:
         Links:
           All Links Enabled: true
           Expand Joint Details: false
-          Expand Link Details: true
+          Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
           iiwa_link_0:
@@ -262,9 +251,14 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          iiwa_link_camera:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
           iiwa_link_ee:
-            Alpha: 0.20000000298023224
-            Show Axes: true
+            Alpha: 1
+            Show Axes: false
             Show Trail: false
             Value: true
           iiwa_mounting_plate:
@@ -331,89 +325,6 @@ Visualization Manager:
           Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
-          iiwa_link_0:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          iiwa_link_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          iiwa_link_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          iiwa_link_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          iiwa_link_4:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          iiwa_link_5:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          iiwa_link_6:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          iiwa_link_7:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          iiwa_link_ee:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          iiwa_mounting_plate:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          iiwa_mounting_plate_centre_top_surface:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          iiwa_mounting_plate_front_left_bolt:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          optical_table:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          optical_table_back_left_bolt:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          optical_table_back_right_bolt:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          optical_table_front_left_bolt:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          optical_table_front_right_bolt:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          world:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
         Robot Alpha: 1
         Show Robot Collision: false
         Show Robot Visual: true
@@ -518,22 +429,22 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.6353979110717773
+      Pitch: 0.3403981924057007
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.14539875090122223
+      Yaw: 1.2903987169265747
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 999
+  Height: 1016
   Hide Left Dock: false
   Hide Right Dock: false
   MotionPlanning:
     collapsed: false
   MotionPlanning - Trajectory Slider:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd00000004000000000000025700000391fc020000000dfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003b00000143000000c700fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000003c005400720061006a006500630074006f007200790020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000000000000000fb000000280020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000003f00fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e00670100000184000002030000016900fffffffb00000024005200760069007a00560069007300750061006c0054006f006f006c0073004700750069010000038d0000003f0000003f00ffffff000000010000010f00000391fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000003b00000391000000a000fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000004420000003efc0100000002fb0000000800540069006d00650100000000000004420000000000000000fb0000000800540069006d00650100000000000004500000000000000000000004020000039100000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000400000000000002570000039efc020000000dfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d00000147000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000003c005400720061006a006500630074006f007200790020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000000000000000fb000000280020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000004100fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e0067010000018a000002090000017d00fffffffb00000024005200760069007a00560069007300750061006c0054006f006f006c00730047007500690100000399000000420000004100ffffff000000010000010f0000039efc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000003d0000039e000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000004420000003efc0100000002fb0000000800540069006d00650100000000000004420000000000000000fb0000000800540069006d00650100000000000004500000000000000000000003c40000039e00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   RvizVisualToolsGui:
     collapsed: false
   Selection:
@@ -542,6 +453,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: false
-  Width: 1908
-  X: 1920
-  Y: 0
+  Width: 1846
+  X: 74
+  Y: 27
