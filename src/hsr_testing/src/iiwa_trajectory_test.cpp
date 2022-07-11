@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
   using moveit::planning_interface::MoveGroupInterface;
   auto move_group_interface = MoveGroupInterface(node, "iiwa");
   // Set speeds
-  move_group_interface.setMaxVelocityScalingFactor(0.5);
+  move_group_interface.setMaxVelocityScalingFactor(1.0);
   move_group_interface.setMaxAccelerationScalingFactor(1.0);
   // Construct and initialize MoveItVisualTools
   auto moveit_visual_tools =
@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
 
   const int N = 8;
   const double polar_range = 0.7 * PI / 2;
-  const double rad = 0.10;
+  const double rad = 0.1;
   double azimuth[N];
   double polar[N];
   int s = 0;
@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
   }
 
   // Define sample point
-  Eigen::Vector3d s_pos(0.4, 0.6, 0.06);
+  Eigen::Vector3d s_pos(0.4125, 0.6125, 0.06);
   auto const sample_collision_object = [frame_id = move_group_interface.getPlanningFrame(), s_pos, rad]
   {
     moveit_msgs::msg::CollisionObject collision_object;

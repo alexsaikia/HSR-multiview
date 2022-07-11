@@ -7,14 +7,14 @@
     <joint name="${robot_name}_mounting_plate_front_left_bolt_joint" type="fixed">
       <parent link="${robot_name}_mounting_plate_front_left_bolt"/>
       <child link="${robot_name}_mounting_plate"/>
-      <origin xyz="0.1125 0.1125 0" rpy="0 0 0"/>
+      <origin xyz="0.125 0.125 0" rpy="0 0 0"/>
     </joint>
 
     <link name="${robot_name}_mounting_plate">
       <visual>
         <origin xyz="0 0 0.01" rpy="0 0 0"/>
         <geometry>
-          <box size="0.275 0.275 0.02"/>
+          <box size="0.3 0.3 0.02"/>
           <!-- <mesh filename="package://hsr_support/meshes/structure/visual/iiwa_14_mounting_plate.dae"/> -->
         </geometry>
       </visual>
@@ -22,7 +22,7 @@
       <collision>
         <origin xyz="0 0 0.01" rpy="0 0 0"/>
         <geometry>
-          <box size="0.275 0.275 0.02"/>
+          <box size="0.3 0.3 0.02"/>
         </geometry>
       </collision>
     </link>
