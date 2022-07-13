@@ -35,6 +35,9 @@ int main(int argc, char *argv[])
   // Set speeds
   move_group_interface.setMaxVelocityScalingFactor(1.0);
   move_group_interface.setMaxAccelerationScalingFactor(1.0);
+
+  move_group_interface.setPlanningTime(15.0);
+  // move_group_interface.setWorkspace(0.0,0.0,0.0,0.75,0.9,2.0);
   // Construct and initialize MoveItVisualTools
   auto moveit_visual_tools =
       moveit_visual_tools::MoveItVisualTools{node, "world", rviz_visual_tools::RVIZ_MARKER_TOPIC,
