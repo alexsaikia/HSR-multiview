@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
     geometry_msgs::msg::Pose box_pose;
     box_pose.orientation.w = 1.0;
     box_pose.position.x = 0.375;
-    box_pose.position.y = 0.92;
+    box_pose.position.y = 0.94;
     box_pose.position.z = 0.5;
 
     collision_object.primitives.push_back(primitive);
@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
     // Define the pose of the box (relative to the frame_id)
     geometry_msgs::msg::Pose box_pose;
     box_pose.orientation.w = 1.0;
-    box_pose.position.x = 0.77;
+    box_pose.position.x = 0.79;
     box_pose.position.y = 0.45;
     box_pose.position.z = 0.5;
 
@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
     // Define the pose of the box (relative to the frame_id)
     geometry_msgs::msg::Pose box_pose;
     box_pose.orientation.w = 1.0;
-    box_pose.position.x = -0.15;
+    box_pose.position.x = -0.20;
     box_pose.position.y = 0.45;
     box_pose.position.z = 0.5;
 
@@ -125,7 +125,7 @@ int main(int argc, char* argv[])
     geometry_msgs::msg::Pose box_pose;
     box_pose.orientation.w = 1.0;
     box_pose.position.x = 0.375;
-    box_pose.position.y = -0.15;
+    box_pose.position.y = -0.20;
     box_pose.position.z = 0.5;
 
     collision_object.primitives.push_back(primitive);
