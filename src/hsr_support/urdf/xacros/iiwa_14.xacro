@@ -305,7 +305,7 @@
     <joint name="${robot_name}_joint_ee" type="fixed">
       <parent link="${robot_name}_link_camera"/>
       <child link="${robot_name}_link_ee"/>
-      <origin xyz="-0.010 0.00 0.05" rpy="0 0 0"/>
+      <origin xyz="-0.010 0.00 0.06" rpy="0 0 0"/>
     </joint>
 
     <link name="${robot_name}_link_ee">

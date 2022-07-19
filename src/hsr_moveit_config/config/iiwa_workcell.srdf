@@ -64,4 +64,6 @@
     <disable_collisions link1="iiwa_link_7" link2="iiwa_link_camera" reason="Adjacent"/>
     <disable_collisions link1="iiwa_link_camera" link2="iiwa_link_ee" reason="Adjacent"/>
     <disable_collisions link1="iiwa_mounting_plate" link2="optical_table" reason="Adjacent"/>
+    <disable_collisions link1="iiwa_link_camera" link2="camera_link" reason="Adjacent"/>
+    <disable_collisions link1="camera_link" link2="iiwa_link_ee" reason="Adjacent"/>
 </robot>
