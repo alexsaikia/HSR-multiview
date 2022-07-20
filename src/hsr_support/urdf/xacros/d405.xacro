@@ -78,7 +78,7 @@ aluminum peripherial evaluation case.
           <geometry>
             <mesh filename="package://hsr_support/meshes/d405/d405.dae" />
           </geometry>
-          <material name="aluminum"/>
+          <material name="aluminium"/>
         </xacro:if>
         <xacro:unless value="${use_mesh}">
           <origin xyz="0 ${-d405_cam_depth_py} 0" rpy="0 0 0"/>

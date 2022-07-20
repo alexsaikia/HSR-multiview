@@ -283,7 +283,7 @@
     <joint name="${robot_name}_joint_camera" type="fixed">
       <parent link="${robot_name}_link_7"/>
       <child link="${robot_name}_link_camera"/>
-      <origin xyz="0 0 0.126" rpy="0 0 0"/>
+      <origin xyz="0 0 0.126" rpy="0 0 ${pi}"/>
     </joint>
 
     <link name="${robot_name}_link_camera">
