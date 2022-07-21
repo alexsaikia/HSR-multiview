@@ -33,10 +33,10 @@ int main(int argc, char *argv[])
   using moveit::planning_interface::MoveGroupInterface;
   auto move_group_interface = MoveGroupInterface(node, "iiwa");
   // Set speeds
-  move_group_interface.setMaxVelocityScalingFactor(1.0);
-  move_group_interface.setMaxAccelerationScalingFactor(1.0);
+  move_group_interface.setMaxVelocityScalingFactor(0.1);
+  move_group_interface.setMaxAccelerationScalingFactor(0.2);
 
-  move_group_interface.setPlanningTime(15.0);
+  move_group_interface.setPlanningTime(5.0);
   // move_group_interface.setWorkspace(0.0,0.0,0.0,0.75,0.9,2.0);
   // Construct and initialize MoveItVisualTools
   auto moveit_visual_tools =
@@ -187,7 +187,7 @@ int main(int argc, char *argv[])
         moveit_visual_tools.publishSphere(markers, rviz_visual_tools::RED);
         f++;
       }
-      std::cout << "There have been " << s << " successes so far and " << f << " failures." << std::endl;
+      RCLCPP_INFO(logger,"There have been %d successes so far and %d failures.",s,f);
     }
   }
 
