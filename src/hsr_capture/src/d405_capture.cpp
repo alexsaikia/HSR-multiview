@@ -8,17 +8,44 @@
 #include <rclcpp/rclcpp.hpp>
 #include <thread>
 #include <Eigen/Dense>
+#include <sensor_msgs/msg/image.hpp>
+using std::placeholders::_1;
 
 #define PI 3.141592653589793238462643383279502884L /* pi */
+
+class d405_capture : public rclcpp::Node
+{
+  public:
+    d405_capture() : Node("d405_capture")
+    {
+      subscription_infra1 = this->create_subscription<sensor_msgs::msg::Image>(
+      "/camera/infra1/image_rect_raw", 1, std::bind(&d405_capture::infra1_rect_raw_callback, this, _1));
+    }
+
+  private:
+    void infra1_rect_raw_callback(const sensor_msgs::msg::Image::SharedPtr msg) const
+    {
+      RCLCPP_INFO(this->get_logger(), "Left image received from Realsense\tSize: %dx%d - Timestamp: %u.%u sec ",
+                msg->width, msg->height,
+                msg->header.stamp.sec,msg->header.stamp.nanosec);
+    }
+    rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr subscription_infra1;
+    
+};
+
+
+
 
 int main(int argc, char *argv[])
 {
 
   // Initialize ROS and create the Node
   rclcpp::init(argc, argv);
-  auto const node = std::make_shared<rclcpp::Node>(
-      "d405_capture", rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true));
+  // auto const node = std::make_shared<rclcpp::Node>(
+  //     "d405_capture", rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true));
 
+
+  auto const node = std::make_shared<d405_capture>();
   // Create a ROS logger
   auto const logger = rclcpp::get_logger("d405_capture");
 
@@ -62,8 +89,8 @@ int main(int argc, char *argv[])
 
 
   const int N = 8;
-  const double polar_range = 0.7 * PI / 2;
-  const double rad = 0.1;
+  const double polar_range = 0.3 * PI / 2;
+  const double rad = 0.25;
   double azimuth[N];
   double polar[N];
   int s = 0;
