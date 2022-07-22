@@ -11,12 +11,11 @@
 #include "sensor_msgs/image_encodings.hpp"
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
-
 #include <thread>
 #include <Eigen/Dense>
 #include <sensor_msgs/msg/image.hpp>
 using std::placeholders::_1;
-
+using namespace cv;
 #define PI 3.141592653589793238462643383279502884L /* pi */
 
 class d405_capture : public rclcpp::Node
@@ -24,23 +23,36 @@ class d405_capture : public rclcpp::Node
 public:
   d405_capture() : Node("d405_capture")
   {
+    this->declare_parameter<std::string>("data_dir", "/home/asaikia/data/dataset1/");
+    this->declare_parameter<int>("save_imgs", 0);
+    this->declare_parameter<int>("acq_num", 0);
+
     sub_infra1 = this->create_subscription<sensor_msgs::msg::Image>(
         "/camera/infra1/image_rect_raw", 1, std::bind(&d405_capture::infra1_rect_raw_callback, this, _1));
+
     sub_infra2 = this->create_subscription<sensor_msgs::msg::Image>(
         "/camera/infra2/image_rect_raw", 1, std::bind(&d405_capture::infra2_rect_raw_callback, this, _1));
   }
-
-  void imageCallback(const sensor_msgs::msg::Image::SharedPtr &msg)
+  void img_cap(std::string file_path, int acq_num, const sensor_msgs::msg::Image::SharedPtr msg) const
   {
-    cv_bridge::CvImagePtr cv_ptr;
-    try
+    int cap = (this->get_parameter("save_imgs")).as_int();
+    if (cap == 1)
     {
-      cv_ptr = cv_bridge::toCvCopy(msg, msg->encoding);
-    }
-    catch (cv_bridge::Exception &e)
-    {
-      RCLCPP_ERROR(this->get_logger(), "cv_bridge exception: %s", e.what());
-      return;
+      try
+      {
+        cv_bridge::CvImagePtr cvptr;
+        cvptr = cv_bridge::toCvCopy(msg, msg->encoding);
+        std::string name = (this->get_parameter("data_dir")).as_string() + file_path + std::to_string(acq_num) + ".png";
+        imwrite(name, cvptr->image);
+        while (cap == 1)
+        {
+        }
+      }
+      catch (const cv_bridge::Exception &e)
+      {
+        auto logger = rclcpp::get_logger("d405_capture");
+        RCLCPP_ERROR(logger, "Could not convert from '%s'.", msg->encoding.c_str());
+      }
     }
   }
 
@@ -50,6 +62,9 @@ private:
     RCLCPP_INFO(this->get_logger(), "Left image received from Realsense\tSize: %dx%d - Timestamp: %u.%u sec ",
                 msg->width, msg->height,
                 msg->header.stamp.sec, msg->header.stamp.nanosec);
+    std::string file_path = "left_rect_raw/";
+    int acq_num = (this->get_parameter("acq_num")).as_int();
+    img_cap(file_path, acq_num, msg);
   }
   rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_infra1;
 
@@ -58,6 +73,9 @@ private:
     RCLCPP_INFO(this->get_logger(), "Right image received from Realsense\tSize: %dx%d - Timestamp: %u.%u sec ",
                 msg->width, msg->height,
                 msg->header.stamp.sec, msg->header.stamp.nanosec);
+    std::string file_path = "right_rect_raw/";
+    int acq_num = (this->get_parameter("acq_num")).as_int();
+    img_cap(file_path, acq_num, msg);
   }
   rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_infra2;
 };
@@ -67,10 +85,8 @@ int main(int argc, char *argv[])
 
   // Initialize ROS and create the Node
   rclcpp::init(argc, argv);
-  // auto const node = std::make_shared<rclcpp::Node>(
-  //     "d405_capture", rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true));
-
   auto const node = std::make_shared<d405_capture>();
+  // int capture = 0;
   // Create a ROS logger
   auto const logger = rclcpp::get_logger("d405_capture");
 
@@ -84,16 +100,14 @@ int main(int argc, char *argv[])
   // Create the MoveIt MoveGroup Interface
   using moveit::planning_interface::MoveGroupInterface;
   auto move_group_interface = MoveGroupInterface(node, "iiwa");
+
   // Set speeds
   move_group_interface.setMaxVelocityScalingFactor(0.1);
   move_group_interface.setMaxAccelerationScalingFactor(0.2);
-
   move_group_interface.setPlanningTime(5.0);
-  // move_group_interface.setWorkspace(0.0,0.0,0.0,0.75,0.9,2.0);
+
   // Construct and initialize MoveItVisualTools
-  auto moveit_visual_tools =
-      moveit_visual_tools::MoveItVisualTools{node, "world", rviz_visual_tools::RVIZ_MARKER_TOPIC,
-                                             move_group_interface.getRobotModel()};
+  auto moveit_visual_tools = moveit_visual_tools::MoveItVisualTools{node, "world", rviz_visual_tools::RVIZ_MARKER_TOPIC, move_group_interface.getRobotModel()};
   moveit_visual_tools.deleteAllMarkers();
   moveit_visual_tools.loadRemoteControl();
 
@@ -108,6 +122,7 @@ int main(int argc, char *argv[])
     }();
     moveit_visual_tools.publishText(text_pose, text, rviz_visual_tools::WHITE, rviz_visual_tools::XLARGE);
   };
+
   auto const prompt = [&moveit_visual_tools](auto text)
   { moveit_visual_tools.prompt(text); };
 
@@ -161,6 +176,8 @@ int main(int argc, char *argv[])
   {
     for (int j = 0; j < N; j++)
     {
+      node->set_parameter(rclcpp::Parameter("acq_num", N * i + j));
+
       // Set a target Pose
       auto target_pose = [i, j, s_pos, azimuth, polar, rad]
       {
@@ -214,6 +231,7 @@ int main(int argc, char *argv[])
       if (success)
       {
         moveit_visual_tools.trigger();
+        node->set_parameter(rclcpp::Parameter("save_imgs", 0));
         prompt("Press 'next' in the RvizVisualToolsGui window to execute");
         draw_title("Executing");
         moveit_visual_tools.trigger();
@@ -223,6 +241,10 @@ int main(int argc, char *argv[])
         markers.translation().y() = (s_pos[1] + rad * sin(azimuth[j]) * sin(polar[i]));
         markers.translation().z() = (s_pos[2] + rad * cos(polar[i]));
         moveit_visual_tools.publishSphere(markers, rviz_visual_tools::GREEN);
+        prompt("Press 'next' in the RvizVisualToolsGui window to capture data");
+        moveit_visual_tools.trigger();
+        node->set_parameter(rclcpp::Parameter("save_imgs", 1));
+
         s++;
       }
       else
