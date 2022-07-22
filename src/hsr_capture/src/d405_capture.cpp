@@ -6,6 +6,12 @@
 #include <math.h>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
+#include "image_transport/image_transport.hpp"
+#include <cv_bridge/cv_bridge.h>
+#include "sensor_msgs/image_encodings.hpp"
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
 #include <thread>
 #include <Eigen/Dense>
 #include <sensor_msgs/msg/image.hpp>
@@ -15,26 +21,46 @@ using std::placeholders::_1;
 
 class d405_capture : public rclcpp::Node
 {
-  public:
-    d405_capture() : Node("d405_capture")
-    {
-      subscription_infra1 = this->create_subscription<sensor_msgs::msg::Image>(
-      "/camera/infra1/image_rect_raw", 1, std::bind(&d405_capture::infra1_rect_raw_callback, this, _1));
-    }
+public:
+  d405_capture() : Node("d405_capture")
+  {
+    sub_infra1 = this->create_subscription<sensor_msgs::msg::Image>(
+        "/camera/infra1/image_rect_raw", 1, std::bind(&d405_capture::infra1_rect_raw_callback, this, _1));
+    sub_infra2 = this->create_subscription<sensor_msgs::msg::Image>(
+        "/camera/infra2/image_rect_raw", 1, std::bind(&d405_capture::infra2_rect_raw_callback, this, _1));
+  }
 
-  private:
-    void infra1_rect_raw_callback(const sensor_msgs::msg::Image::SharedPtr msg) const
+  void imageCallback(const sensor_msgs::msg::Image::SharedPtr &msg)
+  {
+    cv_bridge::CvImagePtr cv_ptr;
+    try
     {
-      RCLCPP_INFO(this->get_logger(), "Left image received from Realsense\tSize: %dx%d - Timestamp: %u.%u sec ",
+      cv_ptr = cv_bridge::toCvCopy(msg, msg->encoding);
+    }
+    catch (cv_bridge::Exception &e)
+    {
+      RCLCPP_ERROR(this->get_logger(), "cv_bridge exception: %s", e.what());
+      return;
+    }
+  }
+
+private:
+  void infra1_rect_raw_callback(const sensor_msgs::msg::Image::SharedPtr msg) const
+  {
+    RCLCPP_INFO(this->get_logger(), "Left image received from Realsense\tSize: %dx%d - Timestamp: %u.%u sec ",
                 msg->width, msg->height,
-                msg->header.stamp.sec,msg->header.stamp.nanosec);
-    }
-    rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr subscription_infra1;
-    
+                msg->header.stamp.sec, msg->header.stamp.nanosec);
+  }
+  rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_infra1;
+
+  void infra2_rect_raw_callback(const sensor_msgs::msg::Image::SharedPtr msg) const
+  {
+    RCLCPP_INFO(this->get_logger(), "Right image received from Realsense\tSize: %dx%d - Timestamp: %u.%u sec ",
+                msg->width, msg->height,
+                msg->header.stamp.sec, msg->header.stamp.nanosec);
+  }
+  rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_infra2;
 };
-
-
-
 
 int main(int argc, char *argv[])
 {
@@ -43,7 +69,6 @@ int main(int argc, char *argv[])
   rclcpp::init(argc, argv);
   // auto const node = std::make_shared<rclcpp::Node>(
   //     "d405_capture", rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true));
-
 
   auto const node = std::make_shared<d405_capture>();
   // Create a ROS logger
@@ -85,8 +110,6 @@ int main(int argc, char *argv[])
   };
   auto const prompt = [&moveit_visual_tools](auto text)
   { moveit_visual_tools.prompt(text); };
-  
-
 
   const int N = 8;
   const double polar_range = 0.3 * PI / 2;
@@ -214,7 +237,7 @@ int main(int argc, char *argv[])
         moveit_visual_tools.publishSphere(markers, rviz_visual_tools::RED);
         f++;
       }
-      RCLCPP_INFO(logger,"There have been %d successes so far and %d failures.",s,f);
+      RCLCPP_INFO(logger, "There have been %d successes so far and %d failures.", s, f);
     }
   }
 
