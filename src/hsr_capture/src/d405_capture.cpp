@@ -16,6 +16,7 @@
 #include <thread>
 #include <Eigen/Dense>
 #include <sensor_msgs/msg/image.hpp>
+#include <sensor_msgs/msg/camera_info.hpp>
 using std::placeholders::_1;
 using namespace cv;
 #define PI 3.141592653589793238462643383279502884L /* pi */
@@ -25,7 +26,7 @@ class d405_capture : public rclcpp::Node
 public:
   d405_capture() : Node("d405_capture")
   {
-    this->declare_parameter<std::string>("data_dir", "/home/kukasrv/data/dataset1/");
+    this->declare_parameter<std::string>("data_dir", "/home/kukasrv/data/dataset2/");
     this->declare_parameter<int>("save_imgs", 0);
     this->declare_parameter<int>("acq_num", 0);
     this->declare_parameter<int>("count", 0);
@@ -43,7 +44,7 @@ public:
         "/camera/depth/image_rect_raw", 1, std::bind(&d405_capture::depth_callback, this, _1));
 
     sub_depth_cam_info = this->create_subscription<sensor_msgs::msg::CameraInfo>(
-        "/camera/depth/CameraInfo", 1, std::bind(&d405_capture::depth_cam_info_callback, this, _1));
+        "/camera/depth/camera_info", 1, std::bind(&d405_capture::depth_cam_info_callback, this, _1));
   }
 
   void img_cap(std::string file_path, int acq_num, sensor_msgs::msg::Image::SharedPtr msg)
@@ -128,22 +129,23 @@ private:
   void depth_cam_info_callback(sensor_msgs::msg::CameraInfo::SharedPtr msg)
   {
     // Create txt file for camera info
-    char depth_buffer[200];
+    char depth_buffer[250];
     std::ofstream depth_cam_info;
     sprintf(depth_buffer, "%sdepth/CameraInfo.txt", (this->get_parameter("data_dir")).as_string().c_str());
-    depth_cam_info.open(depth_buffer);
-    depth_cam_info.write((char*)&msg,sizeof(msg));
-    // depth_cam_info << msg->header.as_string().c_str() << "\n" 
-    // << msg->height << "\n"
+    depth_cam_info.open("/home/kukasrv/data/dataset2/depth/CameraInfo.txt");
+    // depth_cam_info.write((char*)&msg,sizeof(msg));
+    // depth_cam_info << msg->header.frame_id << "\n"
+    // << msg->height<<"\n"
     // << msg->width << "\n"
-    // << msg->distortion_model.as_string().c_str() << "\n"
-    // << msg->D << "\n"
-    // << msg->K << "\n"
-    // << msg->R << "\n"
-    // << msg->P << "\n"
-    // << msg->binning_x << "\n"
+    // << msg->distortion_model << "\n";
+    // for(auto i:msg->d)depth_cam_info << i << "";
+    // // << msg->d<< "\n"
+    // // << msg->k << "\n"
+    // // << msg->r << "\n"
+    // // << msg->p << "\n"
+    // depth_cam_info << msg->binning_x << "\n"
     // << msg->binning_y << "\n";
-    // Close txt file
+    // // Close txt file
     depth_cam_info.close();
   }
   rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr sub_depth_cam_info;
