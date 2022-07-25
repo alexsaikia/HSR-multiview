@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <iostream>
+#include <fstream>
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <moveit_visual_tools/moveit_visual_tools.h>
@@ -41,37 +42,37 @@ public:
     sub_depth = this->create_subscription<sensor_msgs::msg::Image>(
         "/camera/depth/image_rect_raw", 1, std::bind(&d405_capture::depth_callback, this, _1));
 
-    // sub_depth_cam_info = this->create_subscription<sensor_msgs::msg::CameraInfo>(
-    //     "/camera/depth/CameraInfo", 1, std::bind(&d405_capture::depth_cam_info_callback, this, _1));
-    
-
-        
+    sub_depth_cam_info = this->create_subscription<sensor_msgs::msg::CameraInfo>(
+        "/camera/depth/CameraInfo", 1, std::bind(&d405_capture::depth_cam_info_callback, this, _1));
   }
-  
-  void img_cap(std::string file_path, int acq_num,  sensor_msgs::msg::Image::SharedPtr msg) 
+
+  void img_cap(std::string file_path, int acq_num, sensor_msgs::msg::Image::SharedPtr msg)
   {
-    
+
     if (this->get_parameter("save_imgs").as_int() == 1)
     {
       try
       {
         cv_bridge::CvImagePtr cvptr;
         std::string rgb = "rgb/";
-        if(file_path == rgb){
-        cvptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-        } else {
+        if (file_path == rgb)
+        {
+          cvptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+        }
+        else
+        {
           cvptr = cv_bridge::toCvCopy(msg, msg->encoding);
-          }
+        }
         // std::string name = (this->get_parameter("data_dir")).as_string() + file_path + std::to_string(acq_num) + ".png";
-        char buffer [200];
-        sprintf(buffer,"%s%s%04d.png",(this->get_parameter("data_dir")).as_string().c_str(),file_path.c_str(),acq_num);
+        char buffer[200];
+        sprintf(buffer, "%s%s%04d.png", (this->get_parameter("data_dir")).as_string().c_str(), file_path.c_str(), acq_num);
         imwrite(buffer, cvptr->image);
         this->set_parameter(rclcpp::Parameter("count", this->get_parameter("count").as_int() + 1));
         while (this->get_parameter("save_imgs").as_int() == 1 && this->get_parameter("count").as_int() == 4)
         {
         }
       }
-      catch ( cv_bridge::Exception &e)
+      catch (cv_bridge::Exception &e)
       {
         auto logger = rclcpp::get_logger("d405_capture");
         RCLCPP_ERROR(logger, "Could not convert from '%s'.", msg->encoding.c_str());
@@ -80,7 +81,7 @@ public:
   }
 
 private:
-  void infra1_rect_raw_callback( sensor_msgs::msg::Image::SharedPtr msg) 
+  void infra1_rect_raw_callback(sensor_msgs::msg::Image::SharedPtr msg)
   {
     RCLCPP_INFO(this->get_logger(), "Left image received from Realsense\tSize: %dx%d - Timestamp: %u.%u sec ",
                 msg->width, msg->height,
@@ -91,7 +92,7 @@ private:
   }
   rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_infra1;
 
-  void infra2_rect_raw_callback( sensor_msgs::msg::Image::SharedPtr msg) 
+  void infra2_rect_raw_callback(sensor_msgs::msg::Image::SharedPtr msg)
   {
     RCLCPP_INFO(this->get_logger(), "Right image received from Realsense\tSize: %dx%d - Timestamp: %u.%u sec ",
                 msg->width, msg->height,
@@ -102,7 +103,7 @@ private:
   }
   rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_infra2;
 
-  void rgb_callback( sensor_msgs::msg::Image::SharedPtr msg) 
+  void rgb_callback(sensor_msgs::msg::Image::SharedPtr msg)
   {
     RCLCPP_INFO(this->get_logger(), "Colour image received from Realsense\tSize: %dx%d - Timestamp: %u.%u sec ",
                 msg->width, msg->height,
@@ -113,7 +114,7 @@ private:
   }
   rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_rgb;
 
-  void depth_callback( sensor_msgs::msg::Image::SharedPtr msg) 
+  void depth_callback(sensor_msgs::msg::Image::SharedPtr msg)
   {
     RCLCPP_INFO(this->get_logger(), "Depth map received from Realsense\tSize: %dx%d - Timestamp: %u.%u sec ",
                 msg->width, msg->height,
@@ -123,6 +124,29 @@ private:
     img_cap(file_path, acq_num, msg);
   }
   rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_depth;
+
+  void depth_cam_info_callback(sensor_msgs::msg::CameraInfo::SharedPtr msg)
+  {
+    // Create txt file for camera info
+    char depth_buffer[200];
+    std::ofstream depth_cam_info;
+    sprintf(depth_buffer, "%sdepth/CameraInfo.txt", (this->get_parameter("data_dir")).as_string().c_str());
+    depth_cam_info.open(depth_buffer);
+    depth_cam_info.write((char*)&msg,sizeof(msg));
+    // depth_cam_info << msg->header.as_string().c_str() << "\n" 
+    // << msg->height << "\n"
+    // << msg->width << "\n"
+    // << msg->distortion_model.as_string().c_str() << "\n"
+    // << msg->D << "\n"
+    // << msg->K << "\n"
+    // << msg->R << "\n"
+    // << msg->P << "\n"
+    // << msg->binning_x << "\n"
+    // << msg->binning_y << "\n";
+    // Close txt file
+    depth_cam_info.close();
+  }
+  rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr sub_depth_cam_info;
 };
 
 int main(int argc, char *argv[])
@@ -289,7 +313,9 @@ int main(int argc, char *argv[])
         prompt("Press 'next' in the RvizVisualToolsGui window to capture data");
         moveit_visual_tools.trigger();
         node->set_parameter(rclcpp::Parameter("save_imgs", 1));
-        while(node->get_parameter("count").as_int() != 4){}
+        while (node->get_parameter("count").as_int() != 4)
+        {
+        }
         s++;
       }
       else
@@ -308,6 +334,7 @@ int main(int argc, char *argv[])
     }
   }
 
+  
   // Shutdown ROS
   rclcpp::shutdown();
   spinner.join();
