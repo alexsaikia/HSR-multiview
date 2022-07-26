@@ -14,6 +14,7 @@ find_package(sensor_msgs REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(image_transport REQUIRED)
+find_package(realsense2_camera_msgs REQUIRED)
 
 # uncomment the following section in order to fill in
 # further dependencies manually.
@@ -37,5 +38,6 @@ ament_target_dependencies(
   "OpenCV"
   "cv_bridge"
   "image_transport"
+  "realsense2_camera_msgs"
 )
 ament_package()

@@ -17,6 +17,7 @@
 #include <Eigen/Dense>
 #include <sensor_msgs/msg/image.hpp>
 #include <sensor_msgs/msg/camera_info.hpp>
+#include <realsense2_camera_msgs/msg/extrinsics.hpp>
 using std::placeholders::_1;
 using namespace cv;
 #define PI 3.141592653589793238462643383279502884L /* pi */
@@ -26,7 +27,7 @@ class d405_capture : public rclcpp::Node
 public:
   d405_capture() : Node("d405_capture")
   {
-    this->declare_parameter<std::string>("data_dir", "/home/kukasrv/data/dataset2/");
+    this->declare_parameter<std::string>("data_dir", "/home/kukasrv/data/dataset1/");
     this->declare_parameter<int>("save_imgs", 0);
     this->declare_parameter<int>("acq_num", 0);
     this->declare_parameter<int>("count", 0);
@@ -54,6 +55,15 @@ public:
 
     sub_right_cam_info = this->create_subscription<sensor_msgs::msg::CameraInfo>(
         "/camera/infra2/camera_info", 1, std::bind(&d405_capture::right_cam_info_callback, this, _1));
+
+    sub_extr_depth_to_colour = this->create_subscription<realsense2_camera_msgs::msg::Extrinsics>(
+        "/camera/extrinsics/depth_to_color", 1, std::bind(&d405_capture::extr_depth_to_colour , this, _1));
+    sub_extr_depth_to_depth = this->create_subscription<realsense2_camera_msgs::msg::Extrinsics>(
+        "/camera/extrinsics/depth_to_depth", 1, std::bind(&d405_capture::extr_depth_to_depth , this, _1));
+    sub_extr_depth_to_infra1 = this->create_subscription<realsense2_camera_msgs::msg::Extrinsics>(
+        "/camera/extrinsics/depth_to_infra1", 1, std::bind(&d405_capture::extr_depth_to_infra1 , this, _1));
+    sub_extr_depth_to_infra2 = this->create_subscription<realsense2_camera_msgs::msg::Extrinsics>(
+        "/camera/extrinsics/depth_to_infra2", 1, std::bind(&d405_capture::extr_depth_to_infra2 , this, _1));
   }
 
   void img_cap(std::string file_path, int acq_num, sensor_msgs::msg::Image::SharedPtr msg)
@@ -94,7 +104,7 @@ public:
   {
     std::ofstream cam_info;
     cam_info.open(file_path);
-    cam_info << "Timestamp:," << msg->header.stamp.sec << msg->header.stamp.nanosec << "\n"
+    cam_info << "Timestamp:," << msg->header.stamp.sec <<" ." << msg->header.stamp.nanosec << "\n"
              << "Frame ID:," << msg->header.frame_id << "\n"
              << "Height:," << msg->height << "\n"
              << "Width:," << msg->width << "\n"
@@ -114,8 +124,27 @@ public:
              << "P:,";
     for (auto i : msg->p)
       cam_info << i << ",";
-    cam_info << "Bin X:," << msg->binning_x << "\n"
+    cam_info << "\n" <<"Bin X:," << msg->binning_x << "\n"
              << "Bin Y:," << msg->binning_y << "\n";
+    // // Close txt file
+    cam_info.close();
+  }
+
+  void save_cam_extr(realsense2_camera_msgs::msg::Extrinsics::SharedPtr msg, char *file_path)
+  {
+    std::ofstream cam_info;
+    cam_info.open(file_path);
+    cam_info << "Rot Mat:,";
+    for (auto i : msg->rotation)
+    {
+      cam_info << i << ",";
+    }
+      cam_info << "\n" << "Translation:,";
+    for (auto i : msg->translation)
+      {
+      cam_info << i << ",";
+      }
+    cam_info << "\n";
     // // Close txt file
     cam_info.close();
   }
@@ -226,6 +255,42 @@ private:
     save_cam_info(msg, right_buffer);
   }
   rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr sub_right_cam_info;
+
+  void extr_depth_to_colour(realsense2_camera_msgs::msg::Extrinsics::SharedPtr msg)
+  {
+// Create txt file for camera extrinsics
+    char buffer[250];
+    sprintf(buffer, "%sextr_depth_to_colour.csv", (this->get_parameter("data_dir")).as_string().c_str());
+    save_cam_extr(msg, buffer);
+  }
+  rclcpp::Subscription<realsense2_camera_msgs::msg::Extrinsics>::SharedPtr sub_extr_depth_to_colour;
+
+  void extr_depth_to_depth(realsense2_camera_msgs::msg::Extrinsics::SharedPtr msg)
+  {
+// Create txt file for camera extrinsics
+    char buffer[250];
+    sprintf(buffer, "%sextr_depth_to_depth.csv", (this->get_parameter("data_dir")).as_string().c_str());
+    save_cam_extr(msg, buffer);
+  }
+  rclcpp::Subscription<realsense2_camera_msgs::msg::Extrinsics>::SharedPtr sub_extr_depth_to_depth;
+
+  void extr_depth_to_infra1(realsense2_camera_msgs::msg::Extrinsics::SharedPtr msg)
+  {
+// Create txt file for camera extrinsics
+    char buffer[250];
+    sprintf(buffer, "%sextr_depth_to_infra1.csv", (this->get_parameter("data_dir")).as_string().c_str());
+    save_cam_extr(msg, buffer);
+  }
+  rclcpp::Subscription<realsense2_camera_msgs::msg::Extrinsics>::SharedPtr sub_extr_depth_to_infra1;
+
+  void extr_depth_to_infra2(realsense2_camera_msgs::msg::Extrinsics::SharedPtr msg)
+  {
+// Create txt file for camera extrinsics
+    char buffer[250];
+    sprintf(buffer, "%sextr_depth_to_infra2.csv", (this->get_parameter("data_dir")).as_string().c_str());
+    save_cam_extr(msg, buffer);
+  }
+  rclcpp::Subscription<realsense2_camera_msgs::msg::Extrinsics>::SharedPtr sub_extr_depth_to_infra2;
 };
 
 int main(int argc, char *argv[])
@@ -256,13 +321,13 @@ int main(int argc, char *argv[])
         << "X,"
         << "Y,"
         << "Z,"
-        << "Q_x"
-        << "Q_y"
-        << "Q_z"
-        << "Q_w"
-        << "Roll"
-        << "Pitch"
-        << "Yaw"
+        << "Q_x,"
+        << "Q_y,"
+        << "Q_z,"
+        << "Q_w,"
+        << "Roll,"
+        << "Pitch,"
+        << "Yaw,"
         << "\n";
 
   std::string ee = "iiwa_link_ee";
