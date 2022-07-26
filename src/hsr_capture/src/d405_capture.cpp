@@ -45,6 +45,15 @@ public:
 
     sub_depth_cam_info = this->create_subscription<sensor_msgs::msg::CameraInfo>(
         "/camera/depth/camera_info", 1, std::bind(&d405_capture::depth_cam_info_callback, this, _1));
+
+    sub_rgb_cam_info = this->create_subscription<sensor_msgs::msg::CameraInfo>(
+        "/camera/color/camera_info", 1, std::bind(&d405_capture::rgb_cam_info_callback, this, _1));
+
+    sub_left_cam_info = this->create_subscription<sensor_msgs::msg::CameraInfo>(
+        "/camera/infra1/camera_info", 1, std::bind(&d405_capture::left_cam_info_callback, this, _1));
+
+    sub_right_cam_info = this->create_subscription<sensor_msgs::msg::CameraInfo>(
+        "/camera/infra2/camera_info", 1, std::bind(&d405_capture::right_cam_info_callback, this, _1));
   }
 
   void img_cap(std::string file_path, int acq_num, sensor_msgs::msg::Image::SharedPtr msg)
@@ -79,6 +88,36 @@ public:
         RCLCPP_ERROR(logger, "Could not convert from '%s'.", msg->encoding.c_str());
       }
     }
+  }
+
+  void save_cam_info(sensor_msgs::msg::CameraInfo::SharedPtr msg, char *file_path)
+  {
+    std::ofstream cam_info;
+    cam_info.open(file_path);
+    cam_info << "Timestamp:," << msg->header.stamp.sec << msg->header.stamp.nanosec << "\n"
+             << "Frame ID:," << msg->header.frame_id << "\n"
+             << "Height:," << msg->height << "\n"
+             << "Width:," << msg->width << "\n"
+             << "Distortion model:," << msg->distortion_model << "\n"
+             << "D:,";
+    for (auto i : msg->d)
+      cam_info << i << ",";
+    cam_info << "\n"
+             << "K:,";
+    for (auto i : msg->k)
+      cam_info << i << ",";
+    cam_info << "\n"
+             << "R:,";
+    for (auto i : msg->r)
+      cam_info << i << ",";
+    cam_info << "\n"
+             << "P:,";
+    for (auto i : msg->p)
+      cam_info << i << ",";
+    cam_info << "Bin X:," << msg->binning_x << "\n"
+             << "Bin Y:," << msg->binning_y << "\n";
+    // // Close txt file
+    cam_info.close();
   }
 
 private:
@@ -130,25 +169,37 @@ private:
   {
     // Create txt file for camera info
     char depth_buffer[250];
-    std::ofstream depth_cam_info;
-    sprintf(depth_buffer, "%sdepth/CameraInfo.txt", (this->get_parameter("data_dir")).as_string().c_str());
-    depth_cam_info.open("/home/kukasrv/data/dataset2/depth/CameraInfo.txt");
-    // depth_cam_info.write((char*)&msg,sizeof(msg));
-    // depth_cam_info << msg->header.frame_id << "\n"
-    // << msg->height<<"\n"
-    // << msg->width << "\n"
-    // << msg->distortion_model << "\n";
-    // for(auto i:msg->d)depth_cam_info << i << "";
-    // // << msg->d<< "\n"
-    // // << msg->k << "\n"
-    // // << msg->r << "\n"
-    // // << msg->p << "\n"
-    // depth_cam_info << msg->binning_x << "\n"
-    // << msg->binning_y << "\n";
-    // // Close txt file
-    depth_cam_info.close();
+    sprintf(depth_buffer, "%sdepth/CameraInfo.csv", (this->get_parameter("data_dir")).as_string().c_str());
+    save_cam_info(msg, depth_buffer);
   }
   rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr sub_depth_cam_info;
+
+  void rgb_cam_info_callback(sensor_msgs::msg::CameraInfo::SharedPtr msg)
+  {
+    // Create txt file for camera info
+    char rgb_buffer[250];
+    sprintf(rgb_buffer, "%srgb/CameraInfo.csv", (this->get_parameter("data_dir")).as_string().c_str());
+    save_cam_info(msg, rgb_buffer);
+  }
+  rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr sub_rgb_cam_info;
+
+  void left_cam_info_callback(sensor_msgs::msg::CameraInfo::SharedPtr msg)
+  {
+    // Create txt file for camera info
+    char left_buffer[250];
+    sprintf(left_buffer, "%sleft_rect_raw/CameraInfo.csv", (this->get_parameter("data_dir")).as_string().c_str());
+    save_cam_info(msg, left_buffer);
+  }
+  rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr sub_left_cam_info;
+
+  void right_cam_info_callback(sensor_msgs::msg::CameraInfo::SharedPtr msg)
+  {
+    // Create txt file for camera info
+    char right_buffer[250];
+    sprintf(right_buffer, "%sright_rect_raw/CameraInfo.csv", (this->get_parameter("data_dir")).as_string().c_str());
+    save_cam_info(msg, right_buffer);
+  }
+  rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr sub_right_cam_info;
 };
 
 int main(int argc, char *argv[])
@@ -336,7 +387,6 @@ int main(int argc, char *argv[])
     }
   }
 
-  
   // Shutdown ROS
   rclcpp::shutdown();
   spinner.join();
