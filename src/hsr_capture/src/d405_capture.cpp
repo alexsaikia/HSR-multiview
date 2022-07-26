@@ -120,6 +120,32 @@ public:
     cam_info.close();
   }
 
+  void savePose(std::ofstream &pose, moveit::planning_interface::MoveGroupInterface &move_group_interface, const std::string &end_effector_link)
+  {
+    const std::string &eef = end_effector_link.empty() ? move_group_interface.getEndEffectorLink() : end_effector_link;
+    geometry_msgs::msg::PoseStamped msg;
+    std::vector<double> rpy_msg;
+    msg = move_group_interface.getCurrentPose(eef);
+    rpy_msg = move_group_interface.getCurrentRPY(eef);
+    char buffer[25];
+    sprintf(buffer, "%04ld", (this->get_parameter("acq_num")).as_int());
+    pose
+        << buffer << ","
+        << msg.header.stamp.sec << "." << msg.header.stamp.nanosec << ","
+        << msg.header.frame_id << ","
+        << msg.pose.position.x << ","
+        << msg.pose.position.y << ","
+        << msg.pose.position.z << ","
+        << msg.pose.orientation.x << ","
+        << msg.pose.orientation.y << ","
+        << msg.pose.orientation.z << ","
+        << msg.pose.orientation.w << ","
+        << rpy_msg[0] << ","
+        << rpy_msg[1] << ","
+        << rpy_msg[2]
+        << "\n";
+  }
+
 private:
   void infra1_rect_raw_callback(sensor_msgs::msg::Image::SharedPtr msg)
   {
@@ -219,6 +245,28 @@ int main(int argc, char *argv[])
   auto spinner = std::thread([&executor]()
                              { executor.spin(); });
 
+  // Open csv file to store Poses
+  char pose_buffer[250];
+  sprintf(pose_buffer, "%sposes.csv", (node->get_parameter("data_dir")).as_string().c_str());
+  std::ofstream poses;
+  poses.open(pose_buffer);
+  poses << "Image #,"
+        << "Time,"
+        << "Frame ID,"
+        << "X,"
+        << "Y,"
+        << "Z,"
+        << "Q_x"
+        << "Q_y"
+        << "Q_z"
+        << "Q_w"
+        << "Roll"
+        << "Pitch"
+        << "Yaw"
+        << "\n";
+
+  std::string ee = "iiwa_link_ee";
+  
   // Create the MoveIt MoveGroup Interface
   using moveit::planning_interface::MoveGroupInterface;
   auto move_group_interface = MoveGroupInterface(node, "iiwa");
@@ -366,6 +414,7 @@ int main(int argc, char *argv[])
         prompt("Press 'next' in the RvizVisualToolsGui window to capture data");
         moveit_visual_tools.trigger();
         node->set_parameter(rclcpp::Parameter("save_imgs", 1));
+        node->savePose(poses, move_group_interface, ee);
         while (node->get_parameter("count").as_int() != 4)
         {
         }
@@ -386,6 +435,9 @@ int main(int argc, char *argv[])
       RCLCPP_INFO(logger, "There have been %d successes so far and %d failures.", s, f);
     }
   }
+
+  // Close pose csv file
+  poses.close();
 
   // Shutdown ROS
   rclcpp::shutdown();
