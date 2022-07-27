@@ -44,8 +44,14 @@ public:
     sub_depth = this->create_subscription<sensor_msgs::msg::Image>(
         "/camera/depth/image_rect_raw", 1, std::bind(&d405_capture::depth_callback, this, _1));
 
+    sub_aligned_depth = this->create_subscription<sensor_msgs::msg::Image>(
+        "/camera/aligned_depth_to_color/image_raw", 1, std::bind(&d405_capture::aligned_depth_callback, this, _1));
+
     sub_depth_cam_info = this->create_subscription<sensor_msgs::msg::CameraInfo>(
         "/camera/depth/camera_info", 1, std::bind(&d405_capture::depth_cam_info_callback, this, _1));
+
+    sub_aligned_depth_cam_info = this->create_subscription<sensor_msgs::msg::CameraInfo>(
+        "/camera/aligned_depth_to_color/camera_info", 1, std::bind(&d405_capture::aligned_depth_cam_info_callback, this, _1));
 
     sub_rgb_cam_info = this->create_subscription<sensor_msgs::msg::CameraInfo>(
         "/camera/color/camera_info", 1, std::bind(&d405_capture::rgb_cam_info_callback, this, _1));
@@ -58,10 +64,13 @@ public:
 
     sub_extr_depth_to_colour = this->create_subscription<realsense2_camera_msgs::msg::Extrinsics>(
         "/camera/extrinsics/depth_to_color", 1, std::bind(&d405_capture::extr_depth_to_colour , this, _1));
+
     sub_extr_depth_to_depth = this->create_subscription<realsense2_camera_msgs::msg::Extrinsics>(
         "/camera/extrinsics/depth_to_depth", 1, std::bind(&d405_capture::extr_depth_to_depth , this, _1));
+
     sub_extr_depth_to_infra1 = this->create_subscription<realsense2_camera_msgs::msg::Extrinsics>(
         "/camera/extrinsics/depth_to_infra1", 1, std::bind(&d405_capture::extr_depth_to_infra1 , this, _1));
+        
     sub_extr_depth_to_infra2 = this->create_subscription<realsense2_camera_msgs::msg::Extrinsics>(
         "/camera/extrinsics/depth_to_infra2", 1, std::bind(&d405_capture::extr_depth_to_infra2 , this, _1));
   }
@@ -88,7 +97,7 @@ public:
         sprintf(buffer, "%s%s%04d.png", (this->get_parameter("data_dir")).as_string().c_str(), file_path.c_str(), acq_num);
         imwrite(buffer, cvptr->image);
         this->set_parameter(rclcpp::Parameter("count", this->get_parameter("count").as_int() + 1));
-        while (this->get_parameter("save_imgs").as_int() == 1 && this->get_parameter("count").as_int() == 4)
+        while (this->get_parameter("save_imgs").as_int() == 1 && this->get_parameter("count").as_int() == 5)
         {
         }
       }
@@ -133,7 +142,7 @@ public:
   void save_cam_extr(realsense2_camera_msgs::msg::Extrinsics::SharedPtr msg, char *file_path)
   {
     std::ofstream cam_info;
-    cam_info.open(file_path);
+    cam_info.open(file_path,std::ios::app);
     cam_info << "Rot Mat:,";
     for (auto i : msg->rotation)
     {
@@ -220,6 +229,26 @@ private:
   }
   rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_depth;
 
+  void aligned_depth_callback(sensor_msgs::msg::Image::SharedPtr msg)
+  {
+    RCLCPP_INFO(this->get_logger(), "Aligned Depth map received from Realsense\tSize: %dx%d - Timestamp: %u.%u sec ",
+                msg->width, msg->height,
+                msg->header.stamp.sec, msg->header.stamp.nanosec);
+    std::string file_path = "aligned_depth/";
+    int acq_num = (this->get_parameter("acq_num")).as_int();
+    img_cap(file_path, acq_num, msg);
+  }
+  rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_aligned_depth;
+
+  void aligned_depth_cam_info_callback(sensor_msgs::msg::CameraInfo::SharedPtr msg)
+  {
+    // Create txt file for camera info
+    char depth_buffer[250];
+    sprintf(depth_buffer, "%saligned_depth/CameraInfo.csv", (this->get_parameter("data_dir")).as_string().c_str());
+    save_cam_info(msg, depth_buffer);
+  }
+  rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr sub_aligned_depth_cam_info;
+
   void depth_cam_info_callback(sensor_msgs::msg::CameraInfo::SharedPtr msg)
   {
     // Create txt file for camera info
@@ -260,7 +289,7 @@ private:
   {
 // Create txt file for camera extrinsics
     char buffer[250];
-    sprintf(buffer, "%sextr_depth_to_colour.csv", (this->get_parameter("data_dir")).as_string().c_str());
+    sprintf(buffer, "%sextrinsics/extr_depth_to_color.csv", (this->get_parameter("data_dir")).as_string().c_str());
     save_cam_extr(msg, buffer);
   }
   rclcpp::Subscription<realsense2_camera_msgs::msg::Extrinsics>::SharedPtr sub_extr_depth_to_colour;
@@ -269,7 +298,7 @@ private:
   {
 // Create txt file for camera extrinsics
     char buffer[250];
-    sprintf(buffer, "%sextr_depth_to_depth.csv", (this->get_parameter("data_dir")).as_string().c_str());
+    sprintf(buffer, "%sextrinsics/extr_depth_to_depth.csv", (this->get_parameter("data_dir")).as_string().c_str());
     save_cam_extr(msg, buffer);
   }
   rclcpp::Subscription<realsense2_camera_msgs::msg::Extrinsics>::SharedPtr sub_extr_depth_to_depth;
@@ -278,7 +307,7 @@ private:
   {
 // Create txt file for camera extrinsics
     char buffer[250];
-    sprintf(buffer, "%sextr_depth_to_infra1.csv", (this->get_parameter("data_dir")).as_string().c_str());
+    sprintf(buffer, "%sextrinsics/extr_depth_to_infra1.csv", (this->get_parameter("data_dir")).as_string().c_str());
     save_cam_extr(msg, buffer);
   }
   rclcpp::Subscription<realsense2_camera_msgs::msg::Extrinsics>::SharedPtr sub_extr_depth_to_infra1;
@@ -287,7 +316,7 @@ private:
   {
 // Create txt file for camera extrinsics
     char buffer[250];
-    sprintf(buffer, "%sextr_depth_to_infra2.csv", (this->get_parameter("data_dir")).as_string().c_str());
+    sprintf(buffer, "%sextrinsics/extr_depth_to_infra2.csv", (this->get_parameter("data_dir")).as_string().c_str());
     save_cam_extr(msg, buffer);
   }
   rclcpp::Subscription<realsense2_camera_msgs::msg::Extrinsics>::SharedPtr sub_extr_depth_to_infra2;
@@ -312,10 +341,10 @@ int main(int argc, char *argv[])
 
   // Open csv file to store Poses
   char pose_buffer[250];
-  sprintf(pose_buffer, "%sposes.csv", (node->get_parameter("data_dir")).as_string().c_str());
-  std::ofstream poses;
-  poses.open(pose_buffer);
-  poses << "Image #,"
+  sprintf(pose_buffer, "%sposes/ee_poses.csv", (node->get_parameter("data_dir")).as_string().c_str());
+  std::ofstream ee_poses;
+  ee_poses.open(pose_buffer);
+  ee_poses << "Image #,"
         << "Time,"
         << "Frame ID,"
         << "X,"
@@ -329,15 +358,77 @@ int main(int argc, char *argv[])
         << "Pitch,"
         << "Yaw,"
         << "\n";
-
   std::string ee = "iiwa_link_ee";
+
+  
+  sprintf(pose_buffer, "%sposes/color_optical_frame_poses.csv", (node->get_parameter("data_dir")).as_string().c_str());
+  std::ofstream color_poses;
+  color_poses.open(pose_buffer);
+  color_poses << "Image #,"
+        << "Time,"
+        << "Frame ID,"
+        << "X,"
+        << "Y,"
+        << "Z,"
+        << "Q_x,"
+        << "Q_y,"
+        << "Q_z,"
+        << "Q_w,"
+        << "Roll,"
+        << "Pitch,"
+        << "Yaw,"
+        << "\n";
+  std::string color_frame = "camera_color_optical_frame";
+
+  
+  sprintf(pose_buffer, "%sposes/depth_optical_frame_poses.csv", (node->get_parameter("data_dir")).as_string().c_str());
+  std::ofstream depth_poses;
+  depth_poses.open(pose_buffer);
+  depth_poses << "Image #,"
+        << "Time,"
+        << "Frame ID,"
+        << "X,"
+        << "Y,"
+        << "Z,"
+        << "Q_x,"
+        << "Q_y,"
+        << "Q_z,"
+        << "Q_w,"
+        << "Roll,"
+        << "Pitch,"
+        << "Yaw,"
+        << "\n";
+  std::string depth_frame = "camera_depth_optical_frame";
+
+  
+  sprintf(pose_buffer, "%sposes/infra1_optical_frame_poses.csv", (node->get_parameter("data_dir")).as_string().c_str());
+  std::ofstream infra1_poses;
+  infra1_poses.open(pose_buffer);
+  infra1_poses << "Image #,"
+        << "Time,"
+        << "Frame ID,"
+        << "X,"
+        << "Y,"
+        << "Z,"
+        << "Q_x,"
+        << "Q_y,"
+        << "Q_z,"
+        << "Q_w,"
+        << "Roll,"
+        << "Pitch,"
+        << "Yaw,"
+        << "\n";
+  std::string infra1_frame = "camera_infra1_optical_frame";
+
+  
+ 
   
   // Create the MoveIt MoveGroup Interface
   using moveit::planning_interface::MoveGroupInterface;
   auto move_group_interface = MoveGroupInterface(node, "iiwa");
 
   // Set speeds
-  move_group_interface.setMaxVelocityScalingFactor(0.25);
+  move_group_interface.setMaxVelocityScalingFactor(0.75);
   move_group_interface.setMaxAccelerationScalingFactor(1.0);
   move_group_interface.setPlanningTime(5.0);
 
@@ -479,8 +570,11 @@ int main(int argc, char *argv[])
         prompt("Press 'next' in the RvizVisualToolsGui window to capture data");
         moveit_visual_tools.trigger();
         node->set_parameter(rclcpp::Parameter("save_imgs", 1));
-        node->savePose(poses, move_group_interface, ee);
-        while (node->get_parameter("count").as_int() != 4)
+        node->savePose(ee_poses, move_group_interface, ee);
+        node->savePose(color_poses, move_group_interface, color_frame);
+        node->savePose(depth_poses, move_group_interface, depth_frame);
+        node->savePose(infra1_poses, move_group_interface, infra1_frame);
+        while (node->get_parameter("count").as_int() != 5)
         {
         }
         s++;
@@ -502,8 +596,10 @@ int main(int argc, char *argv[])
   }
 
   // Close pose csv file
-  poses.close();
-
+  ee_poses.close();
+  color_poses.close();
+depth_poses.close();
+infra1_poses.close();
   // Shutdown ROS
   rclcpp::shutdown();
   spinner.join();
