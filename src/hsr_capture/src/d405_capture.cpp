@@ -27,7 +27,7 @@ class d405_capture : public rclcpp::Node
 public:
   d405_capture() : Node("d405_capture")
   {
-    this->declare_parameter<std::string>("data_dir", "/home/kukasrv/data/dataset1/");
+    this->declare_parameter<std::string>("data_dir", "/home/kukasrv/data/dataset4_r260/");
     this->declare_parameter<int>("save_imgs", 0);
     this->declare_parameter<int>("acq_num", 0);
     this->declare_parameter<int>("count", 0);
@@ -454,7 +454,7 @@ int main(int argc, char *argv[])
 
   const int N = 8;
   const double polar_range = 0.7 * PI / 2;
-  const double rad = 0.15;
+  const double rad = 0.26;
   double azimuth[N];
   double polar[N];
   int s = 0;
@@ -467,7 +467,7 @@ int main(int argc, char *argv[])
   }
 
   // Define sample point
-  Eigen::Vector3d s_pos(0.4125, 0.6125, 0.06);
+  Eigen::Vector3d s_pos(0.4125, 0.6125, 0.12);
   auto const sample_collision_object = [frame_id = move_group_interface.getPlanningFrame(), s_pos, rad]
   {
     moveit_msgs::msg::CollisionObject collision_object;

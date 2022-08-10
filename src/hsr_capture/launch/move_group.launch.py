@@ -16,7 +16,7 @@ configurable_parameters = [{'name': 'camera_name',                  'default': '
                            {'name': 'device_type',                  'default': "''", 'description': 'choose device by type'},
                            {'name': 'config_file',                  'default': "''", 'description': 'yaml config file'},
                            {'name': 'unite_imu_method',             'default': "0", 'description': '[0-None, 1-copy, 2-linear_interpolation]'},
-                           {'name': 'json_file_path',               'default': "''", 'description': 'allows advanced configuration'},
+                           {'name': 'json_file_path',               'default': "'/home/kukasrv/HSR-multiview/src/hsr_capture/launch/rs_config.json'", 'description': 'allows advanced configuration'},
                            {'name': 'log_level',                    'default': 'info', 'description': 'debug log level [DEBUG|INFO|WARN|ERROR|FATAL]'},
                            {'name': 'output',                       'default': 'screen', 'description': 'pipe node output [screen|log]'},
                            {'name': 'depth_module.profile',         'default': '848x480x5', 'description': 'depth module profile'},                           
