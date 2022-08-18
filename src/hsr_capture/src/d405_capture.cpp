@@ -27,10 +27,12 @@ class d405_capture : public rclcpp::Node
 public:
   d405_capture() : Node("d405_capture")
   {
-    this->declare_parameter<std::string>("data_dir", "/home/kukasrv/data/dataset4_r260/");
+    this->declare_parameter<std::string>("data_dir", "/home/kukasrv/data/dataset8/r300/");
+    this->declare_parameter<float>("rad",0.300);
     this->declare_parameter<int>("save_imgs", 0);
     this->declare_parameter<int>("acq_num", 0);
     this->declare_parameter<int>("count", 0);
+    
 
     sub_infra1 = this->create_subscription<sensor_msgs::msg::Image>(
         "/camera/infra1/image_rect_raw", 1, std::bind(&d405_capture::infra1_rect_raw_callback, this, _1));
@@ -428,9 +430,9 @@ int main(int argc, char *argv[])
   auto move_group_interface = MoveGroupInterface(node, "iiwa");
 
   // Set speeds
-  move_group_interface.setMaxVelocityScalingFactor(0.75);
+  move_group_interface.setMaxVelocityScalingFactor(0.8);
   move_group_interface.setMaxAccelerationScalingFactor(1.0);
-  move_group_interface.setPlanningTime(5.0);
+  move_group_interface.setPlanningTime(1.5);
 
   // Construct and initialize MoveItVisualTools
   auto moveit_visual_tools = moveit_visual_tools::MoveItVisualTools{node, "world", rviz_visual_tools::RVIZ_MARKER_TOPIC, move_group_interface.getRobotModel()};
@@ -454,7 +456,8 @@ int main(int argc, char *argv[])
 
   const int N = 8;
   const double polar_range = 0.7 * PI / 2;
-  const double rad = 0.26;
+  const double rad = (node->get_parameter("rad")).as_double();
+  const double sample_rad = 0.175;
   double azimuth[N];
   double polar[N];
   int s = 0;
@@ -467,8 +470,8 @@ int main(int argc, char *argv[])
   }
 
   // Define sample point
-  Eigen::Vector3d s_pos(0.4125, 0.6125, 0.12);
-  auto const sample_collision_object = [frame_id = move_group_interface.getPlanningFrame(), s_pos, rad]
+  Eigen::Vector3d s_pos(0.4125, 0.6125, 0.06);
+  auto const sample_collision_object = [frame_id = move_group_interface.getPlanningFrame(), s_pos,sample_rad]
   {
     moveit_msgs::msg::CollisionObject collision_object;
     collision_object.header.frame_id = frame_id;
@@ -478,7 +481,7 @@ int main(int argc, char *argv[])
     // Define the size of the box in meters
     primitive.type = primitive.SPHERE;
     primitive.dimensions.resize(1);
-    primitive.dimensions[primitive.SPHERE_RADIUS] = 0.9 * rad;
+    primitive.dimensions[primitive.SPHERE_RADIUS] = sample_rad;
 
     // Define the pose of the box (relative to the frame_id)
     geometry_msgs::msg::Pose box_pose;
@@ -598,8 +601,8 @@ int main(int argc, char *argv[])
   // Close pose csv file
   ee_poses.close();
   color_poses.close();
-depth_poses.close();
-infra1_poses.close();
+  depth_poses.close();
+  infra1_poses.close();
   // Shutdown ROS
   rclcpp::shutdown();
   spinner.join();
