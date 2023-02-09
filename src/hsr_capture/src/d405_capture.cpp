@@ -27,11 +27,12 @@ class d405_capture : public rclcpp::Node
 public:
   d405_capture() : Node("d405_capture")
   {
-    this->declare_parameter<std::string>("data_dir", "/home/kukasrv/data/dataset8/r300/");
-    this->declare_parameter<float>("rad",0.300);
+    this->declare_parameter<std::string>("data_dir", "/home/kukasrv/data/dataset9/r200/");
+    this->declare_parameter<float>("rad",0.200);
     this->declare_parameter<int>("save_imgs", 0);
     this->declare_parameter<int>("acq_num", 0);
     this->declare_parameter<int>("count", 0);
+    this->declare_parameter<int>("frame",0);
     
 
     sub_infra1 = this->create_subscription<sensor_msgs::msg::Image>(
@@ -109,6 +110,33 @@ public:
         RCLCPP_ERROR(logger, "Could not convert from '%s'.", msg->encoding.c_str());
       }
     }
+  }
+
+  void vid_cap(std::string file_path, int acq_num, sensor_msgs::msg::Image::SharedPtr msg)
+  {
+      try
+      {
+        cv_bridge::CvImagePtr cvptr;
+        std::string rgb = "rgb/";
+        std::string rgb_vid = "rgb_vid/";
+        if (file_path == rgb || file_path == rgb_vid)
+        {
+          cvptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+        }
+        else
+        {
+          cvptr = cv_bridge::toCvCopy(msg, msg->encoding);
+        }
+        // std::string name = (this->get_parameter("data_dir")).as_string() + file_path + std::to_string(acq_num) + ".png";
+        char buffer[200];
+        sprintf(buffer, "%s%s%08d.png", (this->get_parameter("data_dir")).as_string().c_str(), file_path.c_str(), acq_num);
+        imwrite(buffer, cvptr->image);        
+      }
+      catch (cv_bridge::Exception &e)
+      {
+        auto logger = rclcpp::get_logger("d405_capture");
+        RCLCPP_ERROR(logger, "Could not convert from '%s'.", msg->encoding.c_str());
+      }
   }
 
   void save_cam_info(sensor_msgs::msg::CameraInfo::SharedPtr msg, char *file_path)
@@ -217,6 +245,10 @@ private:
     std::string file_path = "rgb/";
     int acq_num = (this->get_parameter("acq_num")).as_int();
     img_cap(file_path, acq_num, msg);
+    // std::string file_path1 = "rgb_vid/";
+    // int frame_num = (this->get_parameter("frame")).as_int();
+    // vid_cap(file_path1, frame_num, msg);
+    // this->set_parameter(rclcpp::Parameter("frame", frame_num+1));
   }
   rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_rgb;
 
@@ -430,9 +462,9 @@ int main(int argc, char *argv[])
   auto move_group_interface = MoveGroupInterface(node, "iiwa");
 
   // Set speeds
-  move_group_interface.setMaxVelocityScalingFactor(0.8);
+  move_group_interface.setMaxVelocityScalingFactor(1.0);
   move_group_interface.setMaxAccelerationScalingFactor(1.0);
-  move_group_interface.setPlanningTime(1.5);
+  move_group_interface.setPlanningTime(1.0);
 
   // Construct and initialize MoveItVisualTools
   auto moveit_visual_tools = moveit_visual_tools::MoveItVisualTools{node, "world", rviz_visual_tools::RVIZ_MARKER_TOPIC, move_group_interface.getRobotModel()};
@@ -454,7 +486,7 @@ int main(int argc, char *argv[])
   auto const prompt = [&moveit_visual_tools](auto text)
   { moveit_visual_tools.prompt(text); };
 
-  const int N = 8;
+  const int N = 6;
   const double polar_range = 0.7 * PI / 2;
   const double rad = (node->get_parameter("rad")).as_double();
   const double sample_rad = 0.175;
