@@ -1,0 +1,58 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 500  # Hz
+
+    iiwa_forward_command_controller_position:
+      type: forward_command_controller/ForwardCommandController
+
+    joint_state_controller:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    iiwa_arm_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+joint_state_controller:
+  ros__parameters:
+    type:         joint_state_broadcaster/JointStateBroadcaster
+    publish_rate: 500
+
+iiwa_arm_controller:
+  ros__parameters:
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+    joints:
+      - iiwa_joint_1
+      - iiwa_joint_2
+      - iiwa_joint_3
+      - iiwa_joint_4
+      - iiwa_joint_5
+      - iiwa_joint_6
+      - iiwa_joint_7
+    state_publish_rate: 500.0
+    action_monitor_rate: 500.0
+    allow_partial_joints_goal: false
+    constraints:
+      stopped_velocity_tolerance: 0.0
+      goal_time: 0.0
+
+iiwa_forward_command_controller_position:
+  ros__parameters:
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+      - effort
+    joints:
+      - iiwa_joint_1
+      - iiwa_joint_2
+      - iiwa_joint_3
+      - iiwa_joint_4
+      - iiwa_joint_5
+      - iiwa_joint_6
+      - iiwa_joint_7
+    interface_name: position
+

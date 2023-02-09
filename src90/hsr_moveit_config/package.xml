@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package format="3">
+
+  <name>hsr_moveit_config</name>
+  <version>0.3.0</version>
+  <description>
+     An automatically generated package with all the configuration and launch files for using the iiwa_gripper with the MoveIt Motion Planning Framework
+  </description>
+  <author email="alexander.saikia.21@ucl.ac.uk">Alex Saikia</author>
+  <maintainer email="alexander.saikia.21@ucl.ac.uk">Alex Saikia</maintainer>
+  <license>Apache License 2.0</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <exec_depend>hsr_support</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
+
